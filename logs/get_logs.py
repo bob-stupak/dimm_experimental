@@ -14,9 +14,28 @@ import os.path
 import pylab as plt
 
 import matplotlib.dates as mdates
+from matplotlib import rc
+rc('text',usetex=True)
+rc('font',**{'family':'serif','serif':['Times']})
 
 sys.path.append('../')
 from common_parms import LOG_DIR
+
+TABLE_DATES=[(2,25,2020),(2,18,2020),
+  (2,17,2020),(2,16,2020),(2,15,2020),(2,14,2020),(2,13,2020),(2,8,2020),(2,7,2020),
+  (2,6,2020),(2,5,2020),(2,3,2020),(2,2,2020),(2,1,2020),(1,31,2020),(1,30,2020),(1,29,2020),
+  (1,28,2020),(1,27,2020),(1,24,2020),(1,11,2020),(1,9,2020),(1,8,2020),(1,7,2020),(1,6,2020),
+  (1,5,2020),(1,4,2020),(1,3,2020),(12,20,2019),(12,19,2019),(12,16,2019),(12,13,2019),
+  (12,11,2019),(12,6,2019),(12,3,2019),(11,27,2019),(11,25,2019),
+  (11,14,2019),(11,13,2019),(11,12,2019),(11,8,2019),(11,7,2019),(11,5,2019),(11,4,2019),
+  (11,2,2019),(11,1,2019),(10,31,2019),(10,30,2019),(7,10,2019),(7,9,2019),(6,27,2019),
+  (6,26,2019),(6,25,2019),(6,21,2019),(6,20,2019),(6,19,2019),(6,7,2019),(6,6,2019),(6,4,2019),
+  (5,24,2019),(5,1,2019),(4,29,2019),(4,25,2019),(4,9,2019),(4,8,2019),(4,4,2019),(4,3,2019),
+  (4,2,2019),(4,1,2019),(3,30,2019),(3,29,2019),(3,15,2019),(3,1,2019),(2,28,2019),(2,8,2019),
+  (1,25,2019),(1,24,2019),(1,23,2019),(1,4,2019),(12,21,2018),(12,20,2018),(12,19,2018),
+  (12,14,2018),(12,13,2018),(11,12,2018),(11,9,2018),(11,8,2018),(11,7,2018),
+  (11,5,2018),(11,2,2018),(11,1,2018),(10,25,2018),(10,19,2018),(9,14,2018),(9,13,2018),
+  (8,13,2018),(8,6,2018),(8,5,2018),(7,31,2018),(7,24,2018),(7,23,2018),(7,4,2018),(7,3,2018)]
 
 def open_tele_log(fname='',mon=2,day=20,year=2017):
   if fname!='':
@@ -177,6 +196,83 @@ def mk_utc_flt(tmes,utcoff=7):
   times=tmes+mm
   t_array=map(lambda x: x.hour+x.minute/60.0+x.second/3600.0,times)
   return t_array
+
+def dt2hours(mon=2,day=6,year=2020):
+  seeing=open_seeing_log(mon=mon,day=day,year=year)
+  dt_array=seeing[0]
+  ff=dt_array-dt_array[0]
+  tofday=datetime.datetime(2020,2,6)+ff
+  return array(tofday),seeing
+def get_all_numbers(idx=4):
+  #return  of open_seeing_log is idx=(0)dt_time,(1)airmass,(2)zdist,(3)epsilon,(4)eps_zcorr,(5)seeing
+  ts_array=[]
+  sg_array=[]
+  for each in TABLE_DATES[:-9]:
+    t,s=dt2hours(mon=each[0],day=each[1],year=each[2])
+    ts_array.append(t)
+    sg_array.append(array(s[idx]))
+  ts_array=array(ts_array)
+  sg_array=array(sg_array)
+  xxx=ts_array.flatten()
+  yyy=sg_array.flatten()
+  return ts_array,sg_array,array([concatenate(xxx[:]),concatenate(yyy[:])])
+
+#### t,s,mymm=get_all_numbers()
+#### c,b,h=hist(mymm[1],50,range=(0.0,5.0)) for all seeing measurement histogram
+#### cdf=cumsum(c)
+#### plot(b[1:],cdf) # To plot cummulative distribution of the histsgram
+### to compare different dates as a function of time of after opening use plot_date(t[0],s[0])
+### to get hist of a certain day, use >>> c,b,h=hist(s[0],100,range=(0.0,5.0))
+
+def all_hist_cdf_plot(maxlim=3.0):
+  t,s,mymm=get_all_numbers()
+  x,y=TABLE_DATES[0],TABLE_DATES[-9]
+  subplot(211)
+  tt='Histogram and CDF for %d days of KPDIMM seeing measurements' % (len(s))
+  tt='%s\nbetween %s and %s corrected for airmass.' % \
+    (tt,datetime.datetime(y[2],y[0],y[1]).strftime('%d %b %Y'),datetime.datetime(x[2],x[0],x[1]).strftime('%d %b %Y'))
+  title(tt,size=20.0)
+  c,b,h=hist(mymm[1],100,range=(0.0,maxlim))
+  grid(True)
+  mstr='$0.0<\epsilon<$%4.2f' % (maxlim)
+  text(2.0/3.0*maxlim,c.max()/2.0,mstr,size=20)
+  mstr='$\mu\pm\sigma=$%5.4f$\pm$%5.4f' % (mymm[1][where(mymm[1]<maxlim)].mean(),\
+    mymm[1][where(mymm[1]<maxlim)].std())
+  text(2.0/3.0*maxlim,c.max()/2.30,mstr,size=20)
+  mstr='$\\tilde{x}=$%5.4f' % (median(mymm[1][where(mymm[1]<maxlim)]))
+  text(2.0/3.0*maxlim,c.max()/2.90,mstr,size=20)
+  cdf=cumsum(c)
+  xlabel('Corrected Seeing (\")',size=20)
+  ylabel('Number',size=20)
+  subplot(212)
+  plot(b[1:],cdf)
+  grid(True)
+  xlabel('Corrected Seeing (\")',size=20)
+  ylabel('Number',size=20)
+  return
+
+# Some fun and interesting seeing data analyisis:
+def see_analysis(maxseeing=5.0):
+  a,b,am=get_all_numbers(idx=1)
+  a,b,rs=get_all_numbers(idx=3)
+  a,b,cs=get_all_numbers(idx=4)
+  am[1]=am[1].astype('f')
+  rs[1]=rs[1].astype('f')
+  cs[1]=cs[1].astype('f')
+  return am,rs,cs
+# airmass=am[where(rs[1]<maxseeing)]
+# rawseeing=rs[where(rs[1]<maxseeing)]
+# corrseeing=cs[where(rs[1]<maxseeing)]
+# return airmass,rawseeing,corrseeing
+#m,b=polyfit(airmass[1],rawseeing[1],1)
+#
+#  This produces the first order polynomial fit for m and b of rawseeing vs airmass
+#
+#plot(arange(1.0,maxseeing,0.01),m*arange(1.0,maxseeing,0.01)+b,'-',color='Black')
+#plot(airmass,rawseeing,'.',color='Purple')
+#
+#hist(rawseeing,100,)
+
 #
 # used as
 #>>> from numpy import *
@@ -206,20 +302,6 @@ def compare_see(mon1=9,day1=13,year1=2018,mon2=9,day2=14,year2=2018):
   grid(True)
   ylim(0.0,5.0)
   return
-
-TABLE_DATES=[(2,2,2020),(2,1,2020),(1,31,2020),(1,30,2020),(1,29,2020),
-  (1,28,2020),(1,27,2020),(1,24,2020),(1,11,2020),(1,9,2020),(1,8,2020),(1,7,2020),(1,6,2020),
-  (1,5,2020),(1,4,2020),(1,3,2020),(12,20,2019),(12,19,2019),(12,16,2019),(12,13,2019),
-  (12,11,2019),(12,6,2019),(12,3,2019),(11,27,2019),(11,25,2019),
-  (11,14,2019),(11,13,2019),(11,12,2019),(11,8,2019),(11,7,2019),(11,5,2019),(11,4,2019),
-  (11,2,2019),(11,1,2019),(10,31,2019),(10,30,2019),(7,10,2019),(7,9,2019),(6,27,2019),
-  (6,26,2019),(6,25,2019),(6,21,2019),(6,20,2019),(6,19,2019),(6,7,2019),(6,6,2019),(6,4,2019),
-  (5,24,2019),(5,1,2019),(4,29,2019),(4,25,2019),(4,9,2019),(4,8,2019),(4,4,2019),(4,3,2019),
-  (4,2,2019),(4,1,2019),(3,30,2019),(3,29,2019),(3,15,2019),(3,1,2019),(2,28,2019),(2,8,2019),
-  (1,25,2019),(1,24,2019),(1,23,2019),(1,4,2019),(12,21,2018),(12,20,2018),(12,19,2018),
-  (12,14,2018),(12,13,2018),(11,12,2018),(11,9,2018),(11,8,2018),(11,7,2018),
-  (11,5,2018),(11,2,2018),(11,1,2018),(10,25,2018),(10,19,2018),(9,14,2018),(9,13,2018),
-  (8,13,2018),(8,6,2018),(8,5,2018),(7,31,2018),(7,24,2018),(7,23,2018),(7,4,2018),(7,3,2018)]
 
 def make_see_table(*dates,**kws):
   #Where dates arguments are (mon,day,year) tuples
@@ -275,8 +357,21 @@ def make_see_table(*dates,**kws):
 #>>> mmmm=array(mymm[1]).transpose()
 #>>> plot(range(len(mymm[0])),mmmm[1],'k-')
 #>>> mmmdte=[datetime.datetime.strptime(each,'%m/%d/%Y') for each in mymm[0]]
+#
+#To count the measurements per month use
+#>>> len([each for each in mymm[0] if each{:2]=='01'])
+def cnt_per_mon(ss=None):
+  if not ss:
+    ss=make_see_table(*TABLE_DATES)
+  mmss=ss.split('\n')
+  mymm=loadtxt(iter(mmss[3:-3]),dtype='S10,5>f8,int16',unpack=True)
+  for i in range(1,13):
+    mst=str(i).zfill(2)
+    print '%s: %d' % (datetime.date(2020,i,1).strftime('%B'),len([each for each in mymm[0] if each[:2]==mst]))
+  print 'Total Number of days: %d' % (len(mymm[0]))
+  return
 
-def plot_see_am(fname='',mon=2,day=2,year=2020):
+def plot_see_am(fname='',mon=TABLE_DATES[0][0],day=TABLE_DATES[0][1],year=TABLE_DATES[0][2]):
 # from pylab import rc
 # rc('font',**{'family':'sans-serif','serif':['Times']})
 # rc('text',usetex=True)
@@ -306,7 +401,7 @@ def plot_see_am(fname='',mon=2,day=2,year=2020):
   a.set_ylabel('Seeing(\")',size=14)
   return
 
-def plot_seeing(fname='',mon=2,day=2,year=2020,fig=None):
+def plot_seeing(fname='',mon=TABLE_DATES[0][0],day=TABLE_DATES[0][1],year=TABLE_DATES[0][2],fig=None):
 # from pylab import rc
 # rc('font',**{'family':'sans-serif','serif':['Times']})
 # rc('text',usetex=True)
@@ -404,17 +499,17 @@ if __name__=='__main__':
       dayindex=sys.argv.index('-day')+1
       daynum=sys.argv[dayindex]
     except Exception:
-      daynum=2
+      daynum=TABLE_DATES[0][1]
     try:
       monindex=sys.argv.index('-mon')+1
       monnum=sys.argv[monindex]
     except Exception:
-      monnum=2
+      monnum=TABLE_DATES[0][0]
     try:
       yearindex=sys.argv.index('-year')+1
       yearnum=sys.argv[yearindex]
     except Exception:
-      yearnum=2020
+      yearnum=TABLE_DATES[0][2]
 #   mma=open_tele_log(mon=monnum,day=daynum,year=yearnum)
 #   mmb=open_source_log(mon=monnum,day=daynum,year=yearnum)
     fig=plt.figure()
