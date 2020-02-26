@@ -22,6 +22,7 @@ MEAS_TIMEOUT=180.0
 import sys
 import os,os.path
 import imp
+import platform
 
 progStat=True
 
@@ -38,6 +39,13 @@ def reinit():
   #source_cat_thread.progStat=True
   telescope_thread.progStat=True
   return
+
+if platform.linux_distribution()[0]=='debian':
+  DIMM_SERVER=True
+  DIMM_LOGGING=True
+else:
+  DIMM_SERVER=False
+  DIMM_LOGGING=False
 
 THREAD_MNG={'location':['source_cat_thread.LocationThread',{'name':'DIMM','lon':DIMLNG,'lat':DIMLAT,'elv':DIMELV}],\
             'starcat':['source_cat_thread.StarCatThread',{'location':'self.location','catname':None,'log':False}],\
@@ -123,8 +131,11 @@ class Manager(threading.Thread):
     self.chk_conditions_cnt=30000
     self.location=source_cat_thread.LocationThread(name='DIMM',lon=DIMLNG,lat=DIMLAT,elv=DIMELV)
     self.location.start()
-    self.weather=weather_data_class.weather_thread(loc=self.location,log=True)
-    self.weather.start()
+    if DIMM_SERVER:
+      self.weather=weather_data_class.weather_thread(loc=self.location,log=True)
+      self.weather.start()
+    else:
+      self.weather=None
     self.start()
     return
   def __repr__(self):
@@ -134,7 +145,8 @@ class Manager(threading.Thread):
     ss='\n'
     ss=ss+'<Manager> class is Alive?             %s\n' % (self.isAlive())
     ss=ss+'<Manager.location> class is Alive?    %s\n' % (self.location.isAlive())
-    ss=ss+'<Manager.weather> class is Alive?     %s\n' % (self.weather.isAlive())
+    if DIMM_SERVER:
+      ss=ss+'<Manager.weather> class is Alive?     %s\n' % (self.weather.isAlive())
     ss=ss+'          self.prog_stat:             %r\n' % (self.prog_stat)
     ss=ss+'          self.weather_stat:          %r\n' % (self.weather_stat.isSet())
     ss=ss+'          self.work_time_stat:        %r\n' % (self.work_time_stat.isSet())
@@ -208,7 +220,8 @@ class Manager(threading.Thread):
       self.stop_all()
     except Exception:
       pass
-    self.weather.stop()
+    if DIMM_SERVER:
+      self.weather.stop()
     self.location.stop()
     while self.all_running_flag: pass
     self.manual_run_stat.clear()
@@ -364,8 +377,10 @@ class Manager(threading.Thread):
     #if hasattr(self,'location') and self.chk_conditions_cnt>=3000:
     if hasattr(self,'location') and hasattr(self,'weather') and self.chk_conditions_cnt>=3000:
       time_tmp=self.location.compare_times(time='civil',daytime=False)
-      wea_tmp=self.weather.weather_good
-      #wea_tmp=True
+      if DIMM_SERVER:
+        wea_tmp=self.weather.weather_good
+      else:
+        wea_tmp=True
       if wea_tmp:  self.weather_stat.set()
       else:  self.weather_stat.clear()
       work_time=time_tmp & wea_tmp
@@ -604,8 +619,9 @@ class Manager(threading.Thread):
         self.finderimage.center[0]=array([x,y])
         #self.set_message('set_finder_center:  Source is Centered at finder coordinates (%d,%d)' % (x,y))
         # Only if all of the conditions are met do we want to re-calibrate the telescope's position.
-        self.telescope.re_calibrate()
-        self.set_message('set_finder_center:  Recalibrating Telescope centered at finder coordinates (%d,%d)' % (x,y))
+        if DIMM_SERVER:
+          self.telescope.re_calibrate()
+          self.set_message('set_finder_center:  Recalibrating Telescope centered at finder coordinates (%d,%d)' % (x,y))
       else:
         self.set_message('set_finder_center:  Finder center coordinates (%d,%d) did not change' % \
           (self.finderimage.process_args['coords'][0],self.finderimage.process_args['coords'][1]))
@@ -836,7 +852,8 @@ class Manager(threading.Thread):
       self.set_message('dimm process: Waiting for finder setting')
       self.proc_done_stat.wait()
     time.sleep(0.2)
-    self.image.process_thread.save_img_flag=True
+    if DIMM_SERVER:
+      self.image.process_thread.save_img_flag=True
     self.set_message('dimm process: Running Box Region')
     ### Somewhere in here after the box region, can put if number of objects >=2 then run seeing
     self.image('boxregion',center_type='midpoint')
@@ -935,13 +952,16 @@ class Manager(threading.Thread):
       estrng=');'
       #The following three lines modified in order to prevent colliding connection access, 25Jan2019.
       self.set_message('Sending \'%s\' to ROSE!!!' % (bstrng+sstrng+estrng))
-      #self.weather.db_connection.cursor.execute(bstrng+sstrng+estrng)
-      self.weather.db_connection.send(bstrng+sstrng+estrng)
+      if DIMM_SERVER:
+        #self.weather.db_connection.cursor.execute(bstrng+sstrng+estrng)
+        self.weather.db_connection.send(bstrng+sstrng+estrng)
       #
       self.set_message('Wrote the seeing measurement ROSE!!!')
     except Exception:
-      self.set_message('COULD NOT WRITE LAST SEEING MEASUREMENT TO ROSE, will try to reconnect for next measurement!!!')
-      try: self.weather.db_connection.reconnect()
-      except Exception: pass
+      if DIMM_SERVER:
+        self.set_message('COULD NOT WRITE LAST SEEING MEASUREMENT TO ROSE, will try to reconnect  next measurement!!!')
+        try: self.weather.db_connection.reconnect()
+        except Exception: pass
+      pass
     return
 
