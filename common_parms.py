@@ -30,10 +30,12 @@ DTIME_FORMAT='%m/%d/%Y,%H:%M:%S'
 #DIMM_HOST='140.252.5.166'
 DIMM_HOST='140.252.57.2' #'140.252.57.2/24' on eno2
 DIMM_PRIV='169.254.95.1' #'169.254.95.1/16' on eno1
-if platform.linux_distribution()[0]=='debian':
+if platform.uname()[1]=='dimm-1u':
   DIMM_DIR='/home/mpg/experimental/'
-else:
+elif 'rstupak' in os.path.abspath('./'):
   DIMM_DIR='/home/rstupak/bin/pyDir/dimm/src/experimental/'
+else:
+  DIMM_DIR='./experimental/'
 #
 # The following parameters are the logging file and times
 #
