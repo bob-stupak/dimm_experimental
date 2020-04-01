@@ -201,11 +201,11 @@ class SeeingMeasureGUI(fg.FrameGUI):
                       ['teleEl','Telescope Elv',20,(0,7,3,1,'nsew')],\
                       ['srcZD','Zenith Distance',20,(0,8,3,1,'nsew')],\
                       ['srcAM','Airmass',20,(0,9,3,1,'nsew')],\
-                      ['pixMean','Pixel Dist Mean',20,(0,10,3,1,'nsew')],\
-                      ['pixStd','Pixel Dist Std',20,(0,11,3,1,'nsew')],\
-                      ['epsLongG','Seeing Eps Long G',20,(0,20,3,1,'nsew')],\
+                      #['pixMean','Pixel Dist Mean',20,(0,10,3,1,'nsew')],\
+                      #['pixStd','Pixel Dist Std',20,(0,11,3,1,'nsew')],\
+                      #['epsLongG','Seeing Eps Long G',20,(0,20,3,1,'nsew')],\
                       ['epsLongZ','Seeing Eps Long Z',20,(0,21,3,1,'nsew')],\
-                      ['epsTransG','Seeing Eps Trans G',20,(0,22,3,1,'nsew')],\
+                      #['epsTransG','Seeing Eps Trans G',20,(0,22,3,1,'nsew')],\
                       ['epsTransZ','Seeing Eps Trans Z',20,(0,23,3,1,'nsew')],\
                       ['measNumber','Number Measured',20,(0,30,3,1,'nsew')],\
                       ['rejNumber','Rejects',20,(0,31,3,1,'nsew')]]
@@ -253,110 +253,118 @@ class ManagerGUI(fg.FrameGUI):
 #   self.thread_manager.manual_run_stat.set()
     #self.thread_manager.start_all()
 #   self._figure=icanv.ImageCanvas(root=root,col=5,row=0,colspan=3,rowspan=7)
-    self._mesBarList=[]
+    self._mesBarList=[
+      ['localDateMess','Local Date',15,(0,1,3,1,'nsew')],\
+      ['localTimeMess','Local Time',15,(0,2,3,1,'nsew')],\
+      ['civtwilbegMess','Next Local Civ Twilight',20,(0,3,3,1,'nsew')],\
+      ['civtwilendMess','Next Local Civ Twilight',20,(0,4,3,1,'nsew')],\
+      ['utcDateMess','UTC Date',15,(3,1,3,1,'nsew')],\
+      ['utcTimeMess','UTC Time',15,(3,2,3,1,'nsew')],\
+      ['lstMess','LST',15,(3,3,3,1,'nsew')],\
+      ['domesOpenMess','Domes Opened',15,(3,4,3,1,'nsew')]]
 #   self._checkList=[['logAllStat','Log All','horizontal','radiobutton',\
 #                     ['On','Off'],self.set_log_auto,(0,8,2,1,'nsew')],\
 #                     ['autodimmStat','Run as DIMM','horizontal','radiobutton',\
 #                     ['On','Off'],self.set_run_dimm,(0,9,2,1,'nsew')]]
     self._buttonList=[
                       ['startDIMM','Start DIMM','(lambda slf=self: slf.thread_manager(\'start_dimm\'))',\
-                        (0,0,2,1,'nsew')],\
+                        (0,10,2,1,'nsew')],\
                       ['runnDIMM','Run AutoDIMM','(lambda slf=self: slf.thread_manager.auto_dimm_stat.set())',\
-                        (2,0,2,1,'nsew')],\
+                        (2,10,2,1,'nsew')],\
                       ['stopDIMM','Stop DIMM','(lambda slf=self: slf.thread_manager(\'stop_dimm\'))',\
-                        (4,0,2,1,'nsew')],\
+                        (4,10,2,1,'nsew')],\
                       ['unrunnDIMM','Stop AutoDIMM','(lambda slf=self: slf.thread_manager.auto_dimm_stat.clear())',\
-                        (2,1,2,1,'nsew')],\
+                        (2,11,2,1,'nsew')],\
                       ['manualDIMM','Set Manual','(lambda slf=self: slf.set_manual_mode())',\
-                        (0,1,2,1,'nsew')],\
+                        (0,11,2,1,'nsew')],\
                       ['startProcs','Start processes','(lambda slf=self: slf.thread_manager(\'start_all\'))',\
-                        (0,2,2,1,'nsew')],\
+                        (0,12,2,1,'nsew')],\
                       ['stopProcs','Stop processes','(lambda slf=self: slf.thread_manager(\'stop_all\'))',\
-                        (2,2,2,1,'nsew')],\
+                        (2,12,2,1,'nsew')],\
                       #['stopTest','STOP','(lambda slf=self: slf.thread_manager.cancel_process_stat.set())',\
-                      #(0,3,2,1,'nsew')],\
+                      #(0,13,2,1,'nsew')],\
                       ['stopTest','STOP TEST','(lambda slf=self: slf.stop_measurement())',\
-                      (0,3,2,1,'nsew')],\
+                      (0,13,2,1,'nsew')],\
                       ['writeROSE','Write2Rose','(lambda slf=self: slf.set_report_mode())',\
-                        (4,1,2,1,'nsew')],\
+                        (4,11,2,1,'nsew')],\
                       ['resetProcs','Recover','(lambda slf=self: slf.thread_manager.get_recover_dict())',\
-                      (4,3,2,1,'nsew')],\
+                      (4,13,2,1,'nsew')],\
                       ['setresetProcs','Set Recover','(lambda slf=self: slf.thread_manager.set_recover_dict())',\
-                      (4,4,2,1,'nsew')],\
-                      ['resetMoxaButton','Reset Moxa','(lambda slf=self: slf.reset_moxa())',(4,5,2,1,'nsew')],\
+                      (4,14,2,1,'nsew')],\
+                      ['resetMoxaButton','Reset Moxa','(lambda slf=self: slf.reset_moxa())',(4,15,2,1,'nsew')],\
                       ['boximageButton','Box Region','(lambda slf=self: slf.box_camera())',\
-                      (0,6,2,1,'nsew')],\
+                      (0,16,2,1,'nsew')],\
                       ['resetregionButton','Reset Region','(lambda slf=self: slf.reset_region())',\
-                      (2,6,2,1,'nsew')],\
+                      (2,16,2,1,'nsew')],\
                       ['setcameraFocusButton','Focus Camera',\
                       '(lambda slf=self: slf.thread_manager(\'test_focus\'))',\
-                      (2,4,2,1,'nsew')],\
+                      (2,14,2,1,'nsew')],\
                       ['testNewFuncButton','Test Function',\
                       '(lambda slf=self: slf.thread_manager(\'test_function\'))',\
-                      (0,4,2,1,'nsew')],\
+                      (0,14,2,1,'nsew')],\
                       ['setfindercenterButton','Center Source',\
                       '(lambda slf=self: slf.thread_manager(\'set_finder_center\'))',\
-                      (2,5,2,1,'nsew')],\
+                      (2,15,2,1,'nsew')],\
                       ['testrunButton','Test DIMM','(lambda slf=self: slf.testing_all())',\
-                      (0,5,2,1,'nsew')],\
+                      (0,15,2,1,'nsew')],\
                       ['imagesourceButton','Image Source',\
                         '(lambda slf=self: slf.thread_manager(\'image_source\'))',\
-                      (0,8,2,1,'nsew')],\
+                      (0,18,2,1,'nsew')],\
                       ['imagefinderButton','Image Finder',\
                       '(lambda slf=self: slf.thread_manager.finderimage.process_thread())',\
-                      (0,10,2,1,'nsew')],\
+                      (0,20,2,1,'nsew')],\
                       ['runseeingButton','Run Seeing','(lambda slf=self: slf.thread_manager(\'run_seeing\'))',\
-                      (2,8,2,1,'nsew')],\
+                      (2,18,2,1,'nsew')],\
                       ['finderviewButton','Finder View','(lambda slf=self: slf.thread_manager.run_finder())',\
-                      (0,9,2,1,'nsew')],\
+                      (0,19,2,1,'nsew')],\
                       ['stopfinderButton','Stop Finder','(lambda slf=self: slf.thread_manager.stop_finder())',\
-                      (2,9,2,1,'nsew')],\
+                      (2,19,2,1,'nsew')],\
                       ['movetosourceButton','Move to Source',
                       '(lambda slf=self: slf.thread_manager(\'move_to_source\'))',\
-                      (0,11,2,1,'nsew')],\
+                      (0,21,2,1,'nsew')],\
                       #['chngandgoButton','Change and Go',
                       #'(lambda slf=self: slf.thread_manager(\'change_and_go\'))',\
                       ['chngsourceButton','Change Source',
                       '(lambda slf=self: slf.thread_manager(\'change_source\'))',\
-                      (2,11,2,1,'nsew')],\
+                      (2,21,2,1,'nsew')],\
                       ['movetoparkButton','Move to Park',\
                       '(lambda slf=self: slf.thread_manager(\'park_telescope\'))',\
-                      (0,13,2,1,'nsew')],\
+                      (0,23,2,1,'nsew')],\
                       ['unparkButton','UnPark',\
                       '(lambda slf=self: slf.thread_manager(\'unpark_telescope\'))',\
-                      (2,13,2,1,'nsew')],\
+                      (2,23,2,1,'nsew')],\
                       ['opendomeButton','Open Dome',\
                       '(lambda slf=self: slf.thread_manager(\'open_dome\'))',\
-                      (0,15,2,1,'nsew')],\
+                      (0,25,2,1,'nsew')],\
                       ['closedomeButton','Close Dome',\
                       '(lambda slf=self: slf.thread_manager(\'close_dome\'))',\
-                      (2,15,2,1,'nsew')],\
+                      (2,25,2,1,'nsew')],\
                       ['IPpowerEngButton','IP Power',\
                       '(lambda slf=self: slf.open_ippower_gui())',\
-                      (4,6,2,1,'nsew')],\
+                      (4,16,2,1,'nsew')],\
                       ['finderEngButton','Finder Camera',\
                       '(lambda slf=self: slf.open_finder_gui())',\
-                      (4,13,2,1,'nsew')],\
+                      (4,23,2,1,'nsew')],\
                       ['srcEngButton','Source Info',\
                       '(lambda slf=self: slf.open_esrc_gui())',\
-                      (4,9,2,1,'nsew')],\
+                      (4,19,2,1,'nsew')],\
                       ['teleEngButton','Telescope',\
                       '(lambda slf=self: slf.open_etele_gui())',\
-                      (4,10,2,1,'nsew')],\
+                      (4,20,2,1,'nsew')],\
                       ['domeEngButton','Dome',\
                       '(lambda slf=self: slf.open_edome_gui())',\
-                      (4,11,2,1,'nsew')],\
+                      (4,21,2,1,'nsew')],\
                       ['flagEngButton','Flag Status',\
                       '(lambda slf=self: slf.open_flag_stat_gui())',\
-                      (4,2,2,1,'nsew')],\
+                      (4,22,2,1,'nsew')],\
                       ['WeatherButton','Weather Status',\
                       '(lambda slf=self: slf.open_weather_gui())',\
-                      (4,7,2,1,'nsew')],\
+                      (4,17,2,1,'nsew')],\
                       ['cameraEngButton','Camera',\
                       '(lambda slf=self: slf.open_ecamera_gui())',\
-                      (4,12,2,1,'nsew')]]
+                      (4,22,2,1,'nsew')]]
     self._entryList=[]
-    self._listboxList=[['messagebox','Messages',(0,20,6,5,'nsew')]]
+    self._listboxList=[['messagebox','Messages',(0,30,6,5,'nsew')]]
     fg.FrameGUI.__init__(self,root=root,name='DIMM Items',col=col,row=row,\
       colspan=colspan,rowspan=rowspan)
     #self.logAllStat.setvalue('Off')
@@ -365,7 +373,7 @@ class ManagerGUI(fg.FrameGUI):
     self.stopProcs.configure(state='disabled')
     for each in PROC_BUTTON_LIST+ENG_BUTTON_LIST:
       self.__dict__[each].configure(state='disabled')
-    self.messagebox.listbox.configure(height=3)
+    self.messagebox.listbox.configure(height=1)
     self.mngr_last_running_flag=self.thread_manager.all_running_flag
     self.last_auto_dimm_flag=self.thread_manager.auto_dimm_stat.isSet()
     self.last_cancel_proc_flag=self.thread_manager.cancel_process_stat.isSet()
@@ -419,6 +427,16 @@ class ManagerGUI(fg.FrameGUI):
       self.check_auto_dimm_running()
       self.last_auto_dimm_flag==self.thread_manager.auto_dimm_stat.isSet()
       self.last_cancel_proc_flag==self.thread_manager.cancel_process_stat.isSet()
+    if hasattr(self,'thread_manager'):
+      if hasattr(self.thread_manager,'location'):
+        self.utcDateMess.message('state','%s' % self.thread_manager.location.utc_date)
+        self.utcTimeMess.message('state','%s' % self.thread_manager.location.utc_time)
+        self.localDateMess.message('state','%s' % self.thread_manager.location.local_date)
+        self.localTimeMess.message('state','%s' % self.thread_manager.location.local_time)
+        self.lstMess.message('state','%s' % str(self.thread_manager.location.lst_time))
+        self.civtwilbegMess.message('state','%s' % str(self.thread_manager.location.beg_civil_twilight).split('.')[0])
+        self.civtwilendMess.message('state','%s' % str(self.thread_manager.location.end_civil_twilight).split('.')[0])
+        self.domesOpenMess.message('state','%s' % str(self.thread_manager.work_time_stat.isSet()))
     self.after(1,self.check_update)
     return
   def reset_moxa(self):
@@ -470,8 +488,8 @@ class ManagerGUI(fg.FrameGUI):
     return
   def check_processes_status(self):
     if self.thread_manager.all_running_flag:
-      if not hasattr(self,'tele_status'): self.tele_status=TelescopeStatusGUI(parent=self,col=0,row=25,colspan=3)
-      if not hasattr(self,'seeing_status'): self.seeing_status=SeeingMeasureGUI(parent=self,col=3,row=25,colspan=3)
+      if not hasattr(self,'tele_status'): self.tele_status=TelescopeStatusGUI(parent=self,col=0,row=35,colspan=3)
+      if not hasattr(self,'seeing_status'): self.seeing_status=SeeingMeasureGUI(parent=self,col=3,row=35,colspan=3)
       if not hasattr(self,'_figure'): self._figure=icanv.ImageCanvas(root=root,col=5,row=0,colspan=3,rowspan=7)
       for each in ENG_BUTTON_LIST:
         self.__dict__[each].configure(state='normal')
