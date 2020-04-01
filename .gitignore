@@ -1,2 +1,13 @@
 *.pyc
 */*.pyc
+
+*.swp
+documents/
+html/
+imgdata/
+logs/*/
+logs/seeing.dat.*
+oldcode/
+shellscripts/
+temp/
+
