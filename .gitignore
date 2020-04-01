@@ -2,11 +2,16 @@
 */*.pyc
 
 *.swp
+
+analysis_notes/
 documents/
 html/
 imgdata/
 logs/*/
 logs/seeing.dat.*
+logs/*.csv
+logs/*.sh
+logs/*.txt
 oldcode/
 shellscripts/
 temp/
