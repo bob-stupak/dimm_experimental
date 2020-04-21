@@ -83,17 +83,31 @@ def test_function(mclass,*args,**kwargs):
       @param kwargs:  Other keyword arguements, if required
   '''
   # Save the images for both the finder and the image process
-  mclass.image.process_thread.save_img_flag=True
-  mclass.finderimage.process_thread.save_img_flag=True
+# mclass.image.process_thread.save_img_flag=True
+# mclass.finderimage.process_thread.save_img_flag=True
   # Reset the camera to full frame and binning of 4x4
   mclass.camera.set_roi()
   mclass.camera.set_binning(4,4)
   # Cycle through exposure time (xpt) and gain (gan) settings
   for xpt in [0.001,0.005,0.01,0.05,0.1]:
+    if mclass.cancel_process_stat.isSet(): break#20apr2020 test
     for gan in [0,5,10,15]:
+      if mclass.cancel_process_stat.isSet(): break#20apr2020 test
       mclass.camera.exptime=xpt
       mclass.camera.gain=gan
       mclass.image_source()  # Note can use this since this method resets binning to 4x4
+#
+      try:
+        for i in range(len(mclass.image.process_thread.process.image.peaks)):
+          print 'Exptime:%7.3f, Gain:%d, Peak:%d\nPeak Data Array:%s' % \
+            (xpt,gan,i,array(mclass.image.process_thread.process.image.peaks[i]))
+          #mclass.image.process_thread.process.image.peaks[i].make_fit_data()
+          print '\nFitted parms:%s' % (mclass.image.process_thread.process.image.peaks[i].fit_gaussian(
+            mclass.image.process_thread.process.image.peaks[i].data))
+          #print '\nFitted Data: %s' % (mclass.image.process_thread.process.image.peaks[i].fitted_data)
+      except Exception as err:
+        print 'NOT RIGHT!!!'
+#
       # This next step reports the background and its std to a log.
       mclass.set_message('Testing Camera Gain: %d, Exposure Time: %7.3f, Background: %7.3f, Std: %7.3f' %\
         (gan,xpt,mclass.image.process_thread.process.background,mclass.image.process_thread.process.bgnd_std))
@@ -117,10 +131,24 @@ def test_function(mclass,*args,**kwargs):
     mclass.camera.set_binning(1,1)
     #Redo the exposure and gain testing
     for xpt in [0.001,0.005,0.01,0.05,0.1]:
+      if mclass.cancel_process_stat.isSet(): break #20apr2020 test
       for gan in [0,5,10,15]:
+        if mclass.cancel_process_stat.isSet(): break ##20apr2020 test
         mclass.camera.exptime=xpt
         mclass.camera.gain=gan
         mclass.image.process_thread()
+#
+        try:
+          for i in range(len(mclass.image.process_thread.process.image.peaks)):
+            print 'Exptime:%7.3f, Gain:%d, Peak:%d\nPeak Data Array:%s' % \
+              (xpt,gan,i,array(mclass.image.process_thread.process.image.peaks[i]))
+            #mclass.image.process_thread.process.image.peaks[i].make_fit_data()
+            print '\nFitted parms:%s' % (mclass.image.process_thread.process.image.peaks[i].fit_gaussian(
+              mclass.image.process_thread.process.image.peaks[i].data))
+            #print '\nFitted Data: %s' % (mclass.image.process_thread.process.image.peaks[i].fitted_data)
+        except Exception as err:
+          print 'NOT RIGHT!!!'
+#
         mclass.set_message('Testing Camera Gain: %d, Exposure Time: %7.3f, Background: %7.3f, Std: %7.3f' %\
           (gan,xpt,mclass.image.process_thread.process.background,mclass.image.process_thread.process.bgnd_std))
         #try:
@@ -140,10 +168,24 @@ def test_function(mclass,*args,**kwargs):
   mclass.finder.set_roi()
   mclass.finder.set_binning(4,4)
   for xpt in [0.001,0.005,0.01,0.05,0.1]:
+    if mclass.cancel_process_stat.isSet(): break #20apr2020 test
     for gan in [0,5,10,15]:
+      if mclass.cancel_process_stat.isSet(): break #20apr2020 test
       mclass.finder.exptime=xpt
       mclass.finder.gain=gan
       mclass.finderimage.process_thread()
+#
+      try:
+        for i in range(len(mclass.finderimage.process_thread.process.image.peaks)):
+          print 'Exptime:%7.3f, Gain:%d, Peak:%d\nPeak Data Array:%s' % \
+            (xpt,gan,i,array(mclass.finderimage.process_thread.process.image.peaks[i]))
+          #mclass.finderimage.process_thread.process.image.peaks[i].make_fit_data()
+          print '\nFitted parms:%s' % (mclass.finderimage.process_thread.process.image.peaks[i].fit_gaussian(
+            mclass.finderimage.process_thread.process.image.peaks[i].data))
+          #print '\nFitted Data: %s' % (mclass.finderimage.process_thread.process.image.peaks[i].fitted_data)
+      except Exception as err:
+        print 'NOT RIGHT!!!'
+#
       mclass.set_message('Testing Finder Gain: %d, Exposure Time: %7.3f, Background: %7.3f, Std: %7.3f' %\
         (gan,xpt,mclass.finderimage.process_thread.process.background,mclass.finderimage.process_thread.process.bgnd_std))
 #     try:

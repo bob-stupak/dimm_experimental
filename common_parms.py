@@ -9,6 +9,7 @@ import os.path
 #
 # Basic information for the DIMM site
 #
+SITE_NAME='KP_DIMM'
 DIMLAT=+31.957827    #Mountain
 DIMLNG=-111.597893   #Mountain
 DIMELV=2072.0        #Mountain
