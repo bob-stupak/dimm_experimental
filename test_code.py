@@ -94,9 +94,9 @@ def test_function(mclass,*args,**kwargs):
   mclass.image_source()  # Note can use this since this method resets binning to 4x4
   try: tst=mclass.local_time.replace(':','_')
   except Exception as err: tst='00_00_00'
-  try: src=mclass.image.process_thread.process.image.header['object']
+  try: src=mclass.image.process_thread.process.image.header['object'].replace(' ','').lower()
   except Exception as err: src='unknown'
-  fp=open('%s%s-%s.dat' % (LOG_DIR,src,tst),'w')
+  fp=open('%sapr2020_tests/%s-%s.dat' % (LOG_DIR,src,tst),'w')
   # Cycle through exposure time (xpt) and gain (gan) settings
   for xpt in [0.001,0.005,0.01,0.05,0.1]:
     if mclass.cancel_process_stat.isSet(): break#20apr2020 test
@@ -137,22 +137,33 @@ def test_function(mclass,*args,**kwargs):
   mclass.camera.gain=0
   try:
     #Set a boxed region around the midpoint of the two images in the seeing camera at 4x4 binning
+    mclass.set_message('dimm process: Boxing region')
+    fp.write('dimm process: Boxing region')
     mclass.image('boxregion',center_type='midpoint')
-    mclass.set_message('dimm process: Waiting for results_stat event')
+    mclass.set_message('dimm process: Waiting for results_stat event while boxing region')
+    fp.write('dimm process: Waiting for results_stat event while boxing region')
     mclass.image.results_stat.clear()  #############NEW 23 Oct 2017
     t_out_ret=mclass.image.results_stat.wait(timeout=MEAS_TIMEOUT)         #Timeout added 6June2018
-    if not t_out_ret:  mclass.image.process_thread.stop_measure()   #Timeout condition added 6June2018
-    time.sleep(0.2)  #Changed 8Nov2018
-    #Set the binning back to 1x1 for a 500x500 box around the midpoint of the two star images
-    mclass.camera.set_binning(1,1)
-    #Redo the exposure and gain testing
-    for xpt in [0.001,0.005,0.01,0.05,0.1]:
-      if mclass.cancel_process_stat.isSet(): break #20apr2020 test
-      for gan in [0,5,10,15]:
-        if mclass.cancel_process_stat.isSet(): break ##20apr2020 test
-        mclass.camera.exptime=xpt
-        mclass.camera.gain=gan
-        mclass.image.process_thread()
+    if not t_out_ret:  
+      mclass.image.process_thread.stop_measure()   #Timeout condition added 6June2018
+      mclass.set_message('dimm process: results_stat event timed-out while boxing region')
+      fp.write('dimm process: results_stat event timed-out while boxing region')
+  except Exception as err:
+    fp.write('Error from boxing region: %s' % err)
+    mclass.set_message('Error from boxing region: %s' % err)
+  time.sleep(0.2)  #Changed 8Nov2018
+  #Set the binning back to 1x1 for a 500x500 box around the midpoint of the two star images
+  mclass.camera.set_binning(1,1)
+# try:
+  #Redo the exposure and gain testing
+  for xpt in [0.001,0.005,0.01,0.05,0.1]:
+    if mclass.cancel_process_stat.isSet(): break #20apr2020 test
+    for gan in [0,5,10,15]:
+      mclass.set_message('Gain:%d, Exposure:%7.4f' % (gan,xpt))
+      if mclass.cancel_process_stat.isSet(): break ##20apr2020 test
+      mclass.camera.exptime=xpt
+      mclass.camera.gain=gan
+      mclass.image.process_thread()
 #
 ###   try: print mclass.image.process_thread.process.image.header['object']
 ###   except Exception as err: print 'Header ERROR'
@@ -160,34 +171,32 @@ def test_function(mclass,*args,**kwargs):
         for i in range(len(mclass.image.process_thread.process.image.peaks[:5])):
           fp.write('Exptime:%7.3f, Gain:%d, Peak:%d\nPeak Data Array:%s' % \
             (xpt,gan,i,array(mclass.image.process_thread.process.image.peaks[i])))
-  #       print 'Exptime:%7.3f, Gain:%d, Peak:%d\nPeak Data Array:%s' % \
-  #         (xpt,gan,i,array(mclass.image.process_thread.process.image.peaks[i]))
-          #mclass.image.process_thread.process.image.peaks[i].make_fit_data()
           fp.write('\nFitted parms:%s' % (mclass.image.process_thread.process.image.peaks[i].fit_gaussian(
             mclass.image.process_thread.process.image.peaks[i].data)))
-  #       print '\nFitted parms:%s' % (mclass.image.process_thread.process.image.peaks[i].fit_gaussian(
-  #         mclass.image.process_thread.process.image.peaks[i].data))
-          #print '\nFitted Data: %s' % (mclass.image.process_thread.process.image.peaks[i].fitted_data)
       except Exception as err:
-        fp.write('NOT RIGHT!!!')
-#       print 'NOT RIGHT!!!'
+        print 'IN TRY RANGE Something\'s NOT RIGHT!!!'
+        fp.write('Error: %s' % err)
+        mclass.set_message('Error: %s' % err)
 #
-        mclass.set_message('Testing Camera Gain: %d, Exposure Time: %7.3f, Background: %7.3f, Std: %7.3f' %\
-          (gan,xpt,mclass.image.process_thread.process.background,mclass.image.process_thread.process.bgnd_std))
-        #try:
-        #  print 'Right!!!!'
-        #except Exception:
-        #  print 'NOT RIGHT!!!'
-        time.sleep(1.0) 
-    #Reset the box region, binning to 4x4, exposure time, and gain
-    mclass.image.reset_box=True
-    mclass.image('boxregion')
-    mclass.camera.set_binning(4,4)
-    mclass.camera.exptime=0.1
-    mclass.camera.gain=0
-  except Exception:
-    print 'Something\'s NOT RIGHT!!!'
-    pass
+      mclass.set_message('Testing Camera Gain: %d, Exposure Time: %7.3f, Background: %7.3f, Std: %7.3f' %\
+        (gan,xpt,mclass.image.process_thread.process.background,mclass.image.process_thread.process.bgnd_std))
+      #try:
+      #  print 'Right!!!!'
+      #except Exception:
+      #  print 'NOT RIGHT!!!'
+      time.sleep(1.0) 
+  #Reset the box region, binning to 4x4, exposure time, and gain
+  fp.write('Resetting region:')
+  mclass.set_message('Resetting region:')
+  mclass.image.reset_box=True
+  mclass.image('boxregion')
+  mclass.camera.set_binning(4,4)
+  mclass.camera.exptime=0.1
+  mclass.camera.gain=0
+# except Exception as err:
+#   print 'Something\'s NOT RIGHT!!!'
+#   fp.write('Error: %s' % err)
+#   mclass.set_message('Error: %s' % err)
   #Do the above test for the finderscope camera
   mclass.finder.set_roi()
   mclass.finder.set_binning(4,4)
