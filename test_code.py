@@ -75,6 +75,19 @@ def test_function2(mclass,*args,**kwargs):
   try: print 'Finder:  ',mclass.finderimage.peak_0[1],mclass.finderimage.peak_0[3]
   except: print 'Finder:  NO PEAK 0'
   return
+#ef test_function(mclass,*args,**kwargs):
+def test_function111(mclass,*args,**kwargs):
+  mclass.image.process_thread.save_img_flag=True
+  mclass.camera.exptime=0.1
+  mclass.camera.seq_exp_list=[0.005]
+# mclass.camera.seq_exp_list=[0.005,0.01,0.05,0.1]
+  mclass.camera.gain=0
+  mclass.run_seeing()
+  mclass.image.process_thread.save_img_flag=False
+  mclass.camera.exptime=0.1
+  mclass.camera.seq_exp_list=[0.1]
+  return
+#ef test_function111(mclass,*args,**kwargs):
 def test_function(mclass,*args,**kwargs):
   ''' <test_function> This function is used to create a sort of script so that the dimm manager thread
                       can reload load this module without having to close the main dimm program.
