@@ -84,7 +84,8 @@ class LocationThread(ephem.Observer,threading.Thread):
     '''@ivar: Current UTC time string'''
     self.lst_time=self.sidereal_time()
     '''@ivar: Current LST time this is of type <ephem.Angle>, and is used for calculating HA and separations'''
-    self.local_date,self.local_time=time.strftime(DTIME_FORMAT,self.cur_loc_time).split(',')
+    dt_string=datetime.datetime.strftime(datetime.datetime.now(),DTIME_FORMAT_FLT)[:-4]
+    self.local_date,self.local_time=dt_string.split(',')
     return
   def set_location(self,name='home',lng=0.0,lat=0.0,elv=0.0):
     '''set_location
@@ -222,9 +223,9 @@ class StarCatThread(threading.Thread):
     if not self.location.isAlive():
       self.location.start()
     subdir1=os.path.join(LOG_DIR,time.strftime('%b%Y',time.strptime(self.location.local_date+','+\
-      self.location.local_time,DTIME_FORMAT)))
+      self.location.local_time.split('.')[0],DTIME_FORMAT)))
     fullpath=os.path.join(subdir1,time.strftime('%B%d',time.strptime(self.location.local_date+','+\
-      self.location.local_time,DTIME_FORMAT)))
+      self.location.local_time.split('.')[0],DTIME_FORMAT)))
     if not os.path.exists(fullpath): os.makedirs(fullpath)
     self.logfile_name=os.path.join(fullpath,SRC_LOGBASENAME+'.'+self.location.local_date.replace('/','.'))
     '''@ivar: Log filename '''
@@ -488,9 +489,9 @@ class StarCatThread(threading.Thread):
     '''
     cur_date=self.location.local_date.replace('/','.')
     subdir1=os.path.join(LOG_DIR,time.strftime('%b%Y',time.strptime(self.location.local_date+','+\
-      self.location.local_time,DTIME_FORMAT)))
+      self.location.local_time.split('.')[0],DTIME_FORMAT)))
     fullpath=os.path.join(subdir1,time.strftime('%B%d',time.strptime(self.location.local_date+','+\
-      self.location.local_time,DTIME_FORMAT)))
+      self.location.local_time.split('.')[0],DTIME_FORMAT)))
     if not os.path.exists(fullpath): os.makedirs(fullpath)
     if cur_date not in self.logfile_name:
       self.logfile_name=os.path.join(fullpath,SRC_LOGBASENAME+'.'+cur_date)

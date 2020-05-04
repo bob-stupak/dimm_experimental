@@ -25,6 +25,7 @@ DIMELV=2072.0        #Mountain
 SITE_UTC_OFFSET=7.0
 # Use for time.strftime(DTIME_FORMAT).split(',') to get current date/time
 DTIME_FORMAT='%m/%d/%Y,%H:%M:%S'
+DTIME_FORMAT_FLT='%m/%d/%Y,%H:%M:%S.%f'
 #
 # The base path for the DIMM package
 #

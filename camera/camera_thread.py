@@ -7,7 +7,7 @@ sys.path.append('..')
 from numpy import *
 from Queue import Queue
 import threading
-import time
+import time,datetime
 import os
 import os.path
 import pyfits
@@ -291,7 +291,9 @@ class CameraThread(threading.Thread):
     ''' <get_time>
         A standard formatted time routine, format given in the common_parms.py file
     '''
-    self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+#   self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+    dt_string=datetime.datetime.strftime(datetime.datetime.now(),DTIME_FORMAT_FLT)[:-4]
+    self.local_date,self.local_time=dt_string.split(',')
     return
   def close_camera(self):
     ''' <close_camera>

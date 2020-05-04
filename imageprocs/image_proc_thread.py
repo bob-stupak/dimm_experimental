@@ -20,7 +20,7 @@ from numpy import *
 from pylab import imsave
 import threading
 import Queue
-import time
+import time,datetime
 import os
 import os.path
 import platform
@@ -591,7 +591,9 @@ class ProcessThread(threading.Thread):
     ''' <get_time>
         A standard formatted time routine, format given in the common_parms.py file
     '''
-    self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+#   self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+    dt_string=datetime.datetime.strftime(datetime.datetime.now(),DTIME_FORMAT_FLT)[:-4]
+    self.local_date,self.local_time=dt_string.split(',')
     return
   def write_to_log(self,arg):
     '''<write_to_log>
@@ -648,7 +650,9 @@ class Measurement_thread(threading.Thread):
     threading.Thread.__init__(self)
     self.setName(name)
     self.sleeptime=sleeptime
-    self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+#   self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+    dt_string=datetime.datetime.strftime(datetime.datetime.now(),DTIME_FORMAT_FLT)[:-4]
+    self.local_date,self.local_time=dt_string.split(',')
     '''@ivar: The local date and time set by the local computer.
     '''
     # The following are a set of events to be flagged for processing images

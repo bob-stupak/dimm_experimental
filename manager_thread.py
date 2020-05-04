@@ -1,7 +1,7 @@
 #! /usr/bin/env python manager_thread.py
 #
 import threading
-import time
+import time,datetime
 from numpy import array,all,cos
 from camera import camera_thread,camera_prosilica,camera_sbig,camera_supercircuits
 from dome import dome_thread
@@ -82,7 +82,9 @@ class Manager(threading.Thread):
     '''@ivar: The type/name of the finder device, see the list in <common_parms.py>'''
     self.camera_session=None
     '''@ivar: For the Prosilica cameras a VIMBA session to be used for one or both Prosilica cameras'''
-    self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+#   self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+    dt_string=datetime.datetime.strftime(datetime.datetime.now(),DTIME_FORMAT_FLT)[:-4]
+    self.local_date,self.local_time=dt_string.split(',')
     '''@ivar: The local date and time set by the local computer'''
     self.procedure_type_flag=None  # See dictionary above
     self.proc_done_stat=threading.Event()
@@ -762,7 +764,9 @@ class Manager(threading.Thread):
     ''' <get_time>
         A standard formatted time routine, format given in the common_parms.py file
     '''
-    self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+#   self.local_date,self.local_time=time.strftime(DTIME_FORMAT).split(',')
+    dt_string=datetime.datetime.strftime(datetime.datetime.now(),DTIME_FORMAT_FLT)[:-4]
+    self.local_date,self.local_time=dt_string.split(',')
     self.utc_date,self.utc_time=time.strftime(DTIME_FORMAT,time.gmtime()).split(',')
     return
   def set_message(self,msg):
