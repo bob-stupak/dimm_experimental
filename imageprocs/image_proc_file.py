@@ -309,6 +309,31 @@ def create_hdu(image_list,wr=False):
 #
 #
 #
+def create_hdu_table(image_list):
+  ##A fits table can never be a primary HDU
+  ##Note also that this table hdu can be appended to the hdu_list returned from <create_hdu>
+  c1=pyfits.Column(name='datetime',format='22A',array=
+    array(['%s %s' % (each.header['DATE-OBS'],each.header['TIME-OBS']) for each in image_list]))
+  c2=pyfits.Column(name='object',format='20A',array=array([each.header['OBJECT'] for each in image_list]))
+  ip_proc=ipt.ImageProcess()
+  for each in image_list:
+    try: ip_proc(each,'peaks')
+    except: pass
+  mmbb=array([array([each.calc_background,each.calc_bckgrnd_std]) for each in image_list])
+  c3=pyfits.Column(name='background',format='D',unit='DN',array=mmbb.transpose()[0])
+  c4=pyfits.Column(name='backg_std',format='D',unit='DN',array=mmbb.transpose()[1])
+  c5=pyfits.Column(name='exptime',format='D',array=array([each.header['EXPTIME'] for each in image_list]))
+  c6=pyfits.Column(name='cgain',format='D',array=array([each.header['CGAIN'] for each in image_list]))
+  tbhdu=pyfits.new_table([c4,c1,c2,c3,c5,c6])
+  return tbhdu
+  #Use, for example, like:
+  #>>> mask=tbdata.field('exptime')==0.1
+  #>>> newtbdata=tbdata[mask]
+  #>>> hdu=pyfits.BinTableHDU(newtbdata)
+  #>>> hdu.writeto('newtable.fits')
+#
+#
+#
 class RegionData(object):
   ''' <RegionData> is a class that contains pixeldata for the region of interest
       centered at the <centroid> with a box <box_slices> around it.  <box_slices>
