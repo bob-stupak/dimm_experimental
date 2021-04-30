@@ -5,6 +5,8 @@
 '''
 from pylab import *
 from numpy import *
+import scipy
+import scipy.stats
 import ephem
 import time
 import datetime
@@ -19,7 +21,7 @@ rc('text',usetex=True)
 rc('font',**{'family':'serif','serif':['Times']})
 
 sys.path.append('../')
-from common_parms import LOG_DIR
+from common_parms import LOG_DIR,DIMLAT,DIMLNG,DIMELV
 
 NOT_USED=[(12,17,2019),(12,12,2019),(10,29,2019),(7,25,2019),(6,28,2019),(5,25,2019),(1,8,2019),
           (12,29,2018),(12,12,2018),(10,11,2018),(7,6,2018)] #,(8,13,2018)]
@@ -202,7 +204,36 @@ def mk_utc_flt(tmes,utcoff=7):
   t_array=map(lambda x: x.hour+x.minute/60.0+x.second/3600.0,times)
   return t_array
 
+def perc_dark(mon=2,day=6,year=2020,hr=0,mn=0,sc=0):
+  ''' <perc_dark> a function to return the percentage of nighttime given a datetime.
+      -Can be used like this..
+      >> x=[]
+      >> for i in range(365):  x.append(glg.perc_dark(dte.datetime(2020,1,1,0,0,0)+dte.timedelta(i,0,0)))
+      >> plot(range(365),array(x)*100.0,'r-')
+
+  '''
+  seeing=open_seeing_log(mon=mon,day=day,year=year)
+  dtime=datetime.datetime(year,mon,day,hr,mn,sc)
+  mm=ephem.Observer()
+  mm.lon=str(DIMLNG)
+  mm.lat=str(DIMLAT)
+  mm.elevation=DIMELV
+  perc=[]
+  for dtime in seeing[0]:
+    mm.date=dtime
+    nextrise=ephem.localtime(mm.next_rising(ephem.Sun(),start=dtime))
+    previousset=ephem.localtime(mm.previous_setting(ephem.Sun(),start=nextrise))
+    total_night=nextrise-previousset
+    perc.append(float((dtime-previousset).seconds)/float(total_night.seconds))
+  return array(perc),seeing
+
+# To plot seeing as a function of the percent of night time use the following:
+#>>> m,n,o=glg.TABLE_DATES[6]
+#>>> a,b=glg.perc_dark(mon=m,day=n,year=o)
+#>>> plot(a,b[4],'k-')
+
 def dt2hours(mon=2,day=6,year=2020):
+  ##returns number of hours after opening dome and seeing.  Time is not the timestamp of the data.
   seeing=open_seeing_log(mon=mon,day=day,year=year)
   dt_array=seeing[0]
   ff=dt_array-dt_array[0]
@@ -229,34 +260,100 @@ def get_all_numbers(idx=4):
 ### to compare different dates as a function of time of after opening use plot_date(t[0],s[0])
 ### to get hist of a certain day, use >>> c,b,h=hist(s[0],100,range=(0.0,5.0))
 
-def all_hist_cdf_plot(maxlim=3.0):
+def all_hist_cdf_plot(maxlim=3.0,scale='lin'):
   t,s,mymm=get_all_numbers()
   x,y=TABLE_DATES[0],TABLE_DATES[-9]
   subplot(211)
-  tt='Histogram and CDF for %d days of KPDIMM seeing measurements' % (len(s))
-  tt='%s\nbetween %s and %s corrected for airmass.' % \
-    (tt,datetime.datetime(y[2],y[0],y[1]).strftime('%d %b %Y'),datetime.datetime(x[2],x[0],x[1]).strftime('%d %b %Y'))
+  tt='Histogram and CDF for %d days of KPDIMM seeing measurements between' % (len(s))
+  tt='%s\n%s and %s corrected for airmass, and clipped for an $\epsilon_{max}<%3.1f$.' % \
+    (tt,datetime.datetime(y[2],y[0],y[1]).strftime('%d %b %Y'),
+     datetime.datetime(x[2],x[0],x[1]).strftime('%d %b %Y'),maxlim)
   title(tt,size=20.0)
   c,b,h=hist(mymm[1],100,range=(0.0,maxlim))
-  grid(True)
-  mstr='$0.0<\epsilon<$%4.2f' % (maxlim)
-  text(2.0/3.0*maxlim,c.max()/2.0,mstr,size=20)
-  mstr='$\mu\pm\sigma=$%5.4f$\pm$%5.4f' % (mymm[1][where(mymm[1]<maxlim)].mean(),\
-    mymm[1][where(mymm[1]<maxlim)].std())
-  text(2.0/3.0*maxlim,c.max()/2.30,mstr,size=20)
-  mstr='$\\tilde{x}=$%5.4f' % (median(mymm[1][where(mymm[1]<maxlim)]))
-  text(2.0/3.0*maxlim,c.max()/2.90,mstr,size=20)
+  hist_axs=gca()
+  hist_axs.grid(True)
   cdf=cumsum(c)
-  xlabel('Corrected Seeing (\")',size=20)
-  ylabel('Number',size=20)
+  hist_axs.set_xlabel('Corrected Seeing (\")',size=20)
+  hist_axs.set_ylabel('Number',size=20)
   subplot(212)
   plot(b[1:],cdf)
-  grid(True)
-  xlabel('Corrected Seeing (\")',size=20)
-  ylabel('Number',size=20)
+  cdf_axs=gca()
+  cdf_axs.grid(True)
+  cdf_axs.set_xlabel('Corrected Seeing (\")',size=20)
+  cdf_axs.set_ylabel('Number',size=20)
+  textx=[2.0/3.0*maxlim]*5  # Linear text x-position
+  texty=c.max()/array([1.520,1.725,2.0,2.3,2.9])  # Linear text y-position
+  if scale=='ylog' or scale=='log':
+    hist_axs.set_yscale('log')
+    cdf_axs.set_yscale('log')
+    texty=c.max()/array([log10(1.520)*10.0,log10(1.725)*15.0,log10(2.0)*25.0,log10(2.30)*35.0,log10(2.90)*50.0])
+    if scale=='log':
+      xmax=hist_axs.get_xlim()[1]
+      if maxlim>=10.0: textx=[xmax/5.0]*5
+      else: textx=[0.025]*5
+      cdf_axs.set_xscale('log')
+      hist_axs.set_xscale('log')
+  mstr='$N_{Tot}=%d$' % (int(len(mymm[1])))
+  hist_axs.text(textx[0],texty[0],mstr,size=20) 
+  mstr='$\Sigma N_{(0.0<\epsilon<%3.1f)}=%d$' % (maxlim,int(c.sum()))
+  hist_axs.text(textx[1],texty[1],mstr,size=20)
+  mstr='$\Sigma N/N_{Tot}=%6.3f$' % (c.sum()/len(mymm[1]))
+  hist_axs.text(textx[2],texty[2],mstr,size=20)
+  mstr='$\mu\pm\sigma=$%5.4f$\pm$%5.4f' % (mymm[1][where(mymm[1]<maxlim)].mean(),\
+    mymm[1][where(mymm[1]<maxlim)].std())
+  hist_axs.text(textx[3],texty[3],mstr,size=20)
+  mstr='$\\tilde{x}=$%5.4f' % (median(mymm[1][where(mymm[1]<maxlim)]))
+  hist_axs.text(textx[4],texty[4],mstr,size=20)
   return
 
 # Some fun and interesting seeing data analyisis:
+def confid(i,perc=0.95,maxlim=3.0):
+  '''<confid> will calculate the confidence interval for a normal distribution of the data
+     <i> is the indexed measurement file, if i==-1 take all of seeing measurements
+     <perc> is the percent confidence
+     <maxlim> clips the corrected seeing data to that level
+  '''
+  y=scipy.stats.norm()
+  a,b,cs=get_all_numbers()
+  num_samples=array([len(b[k]) for k in range(len(b))])
+  if i!=-1:
+    bb=b[i][where(b[i]<maxlim)]
+    tot_samples=num_samples[i]
+  else:
+    bb=cs[1][where(cs[1]<maxlim)]
+    tot_samples=len(cs[1])
+  num_bb,m,s,md=len(bb),bb.mean(),bb.std(),median(bb)
+  cnf=y.interval(perc)[1]   # positive only
+  k=cnf*s/num_bb**0.5
+  ##Therefore, the probability that the population(actual) mean falls within range m-k and m+k is <perc> where
+  ##<m> and <s> are the sample mean and sample standard deviation for <num_bb> number of samples.
+  print '\nWith %i total samples clipped to a maximum seeing of %5.3f\":' % (tot_samples,maxlim)
+  print '%i samples remain with a sample mean is %5.3f, a sample std of %5.3f, and a median of %5.3f.' % (num_bb,m,s,md)
+  print 'The confidence interval is k=%5.3f for a gamma=%5.3f' % (k,perc)
+  print '\nP(%5.3f<=%5.3f<=%5.3f)=%5.3f\n' % (m-k,m,m+k,perc)
+  return m-k,m,m+k,s,k,num_bb
+#Use errorbar(x,y,xerr=xerr,yerr=yerr,fmt='kx',ms=3)
+#   
+#  where x,y,xerr,yerr are arrays
+#    x can be a datetime array
+#
+def samp_size(s,perc,length):
+  '''<samp_size> will calculate the sample size for a confidence interval of a prescribed length
+     <s> is the sampled standard deviation
+     <perc> is the percent confidence
+     <length> is the total length of the interval about the mean seeing
+              for example for a mean seeing of 0.85 I want to know the number of samples
+              required to achieve a 99% confidence that the mean will fall with my std
+  '''
+  y=scipy.stats.norm()
+  cnf=y.interval(perc)[1]   # positive only
+  ##In order to get the number of samples necessary for a confidence interal of a prescribed length, lnt=2*cnf is
+  num_required=(2.0*cnf*s/length)**2.0  # Number of required samples for the given std and perc
+  ss='\nThe number of samples necessary to acheive a %5.2f%s confidence interval\n' % (perc*100.0,'%')
+  ss='%sof length %5.3f\" about a sampled mean seeing with std of %5.3f\" is %i.\n' % (ss,length,s,num_required)
+  print ss
+  return 
+
 def see_analysis(maxseeing=5.0):
   a,b,am=get_all_numbers(idx=1)
   a,b,rs=get_all_numbers(idx=3)

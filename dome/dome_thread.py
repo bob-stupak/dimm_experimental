@@ -12,10 +12,10 @@ from common_parms import *
 
 DOME_MOTION_STATUS={
   '0':['stopped','stopped',False],
-  '1':['opening','stopped',True],
-  '2':['closing','stopped',True],
-  '4':['stopped','opening',True],
-  '8':['stopped','closing',True],
+  '1':['closing','stopped',True],
+  '2':['opening','stopped',True],
+  '4':['stopped','closing',True],
+  '8':['stopped','opening',True],
   'x':['unknown','unknown',False]
 }
 DOME_SWITCH_STATUS={
