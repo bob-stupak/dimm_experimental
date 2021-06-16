@@ -270,7 +270,7 @@ class weather_thread(gth.generic_thread):
     loc_tion=kwargs.get('loc',None)
     self.sleeptime=kwargs.get('sleeptime',0.1)
     self.cycle_counts=0
-    gth.generic_thread.__init__(self,prnt=prnt,log=log,sleeptime=self.sleeptime)
+    gth.generic_thread.__init__(self,prnt=prnt,log=log,sleeptime=self.sleeptime,logname='weather.log')
     subdir1=os.path.join(LOG_DIR,time.strftime('%b%Y'))
     fullpath=os.path.join(subdir1,time.strftime('%B%d'))
     if not os.path.exists(fullpath): os.makedirs(fullpath)
