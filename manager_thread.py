@@ -958,7 +958,8 @@ class Manager(threading.Thread):
       self.set_message('Sending \'%s\' to ROSE!!!' % (bstrng+sstrng+estrng))
       if DIMM_SERVER:
         #self.weather.db_connection.cursor.execute(bstrng+sstrng+estrng)
-        self.weather.db_connection.send(bstrng+sstrng+estrng)
+        err=self.weather.db_connection.send(bstrng+sstrng+estrng)
+        if err:  self.set_message(err)
       #
       self.set_message('Wrote the seeing measurement ROSE!!!')
     except Exception:

@@ -112,7 +112,12 @@ class MessageFrame(LabelFrame):
     if type(value)==str: formatted_value='%s' % value
     elif type(value)==float: formatted_value='%10.3f' % value
     else: formatted_value='%r' % value
-    self.__dict__[tag].message('state', formatted_value)
+    #self.__dict__[tag].resetmessages('state')  # Added to see if this will prevent the gui slowing down...
+    try:
+      self.__dict__[tag].message('state', formatted_value)
+      self.__dict__[tag].component('label').update()
+    except Exception as err:
+      pass
     return
 
 class ButtonFrame(LabelFrame):

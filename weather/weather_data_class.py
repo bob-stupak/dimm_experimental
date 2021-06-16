@@ -65,10 +65,14 @@ class Sql_connection(object):
     self.connection_busy.release()
     return data_dict
   def send(self,cmd_string):
+    err=None
     self.connection_busy.acquire()
-    self.cursor.execute(cmd_string)
+    try:
+      self.cursor.execute(cmd_string)
+    except Exception as err:
+      pass
     self.connection_busy.release()
-    return
+    return err
   def check_db_status(self):
     if self.connection:
       try:

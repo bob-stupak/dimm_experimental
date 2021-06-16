@@ -124,43 +124,45 @@ class MeasureGui(fg.FrameGUI):
     self.set_parms_entries()
     return
   def check_update(self):
-    self.proc_flags.set_indicator('Main Thread',self.meas_manager.isAlive())
-    self.proc_flags.set_indicator('results_stat',self.meas_manager.results_stat.isSet())
-    self.proc_mang_mess.message('state','%s' % self.meas_manager.message)
-    self.proc_mang_results.message('state','%r' % self.meas_manager.results)
-    self.message_center.set_message('cur_center','(%7.2f,%7.2f)' % \
-      (self.meas_manager.center[0][0],self.meas_manager.center[0][1]))
-    self.message_center.set_message('delta_vec','(%7.2f,%7.2f,%7.2f)' % \
-      (self.meas_manager.center[1][0],self.meas_manager.center[1][1],self.meas_manager.center[1][2]))
-    self.message_center.set_message('drtheta','(%7.2f,%7.2f)' % \
-      (self.meas_manager.center[2][0],self.meas_manager.center[2][1]))
-    self.message_center.set_message('direct','%s' % self.meas_manager.center[3].capitalize())
-    self.message_midpnt.set_message('midpoint','(%7.2f,%7.2f)' % \
-      (self.meas_manager.midpoint[0][0],self.meas_manager.midpoint[0][1]))
-    self.message_midpnt.set_message('delta_vec','(%7.2f,%7.2f,%7.2f)' % \
-      (self.meas_manager.midpoint[1][0],self.meas_manager.midpoint[1][1],self.meas_manager.midpoint[1][2]))
-    self.message_midpnt.set_message('drtheta','(%7.2f,%7.2f)' % \
-      (self.meas_manager.midpoint[2][0],self.meas_manager.midpoint[2][1]))
-    self.message_midpnt.set_message('direct','%s' % self.meas_manager.midpoint[3].capitalize())
-    self.message_peaks0.set_message('index','%d' % self.meas_manager.peak_0[0])
-    self.message_peaks0.set_message('x_y','(%7.3f,%7.3f)' % \
-      (self.meas_manager.peak_0[1],self.meas_manager.peak_0[3]))
-    self.message_peaks0.set_message('x_y_width','(%7.3f,%7.3f)' % \
-      (self.meas_manager.peak_0[2],self.meas_manager.peak_0[4]))
-    self.message_peaks0.set_message('height','%8.3f' % self.meas_manager.peak_0[5])
-    self.message_peaks1.set_message('index','%d' % self.meas_manager.peak_1[0])
-    self.message_peaks1.set_message('x_y','(%7.3f,%7.3f)' % \
-      (self.meas_manager.peak_1[1],self.meas_manager.peak_1[3]))
-    self.message_peaks1.set_message('x_y_width','(%7.3f,%7.3f)' % \
-      (self.meas_manager.peak_1[2],self.meas_manager.peak_1[4]))
-    self.message_peaks1.set_message('height','%8.3f' % self.meas_manager.peak_1[5])
-    self.message_seeing.set_message('eps_lg','%8.3f' % self.meas_manager.seeing[0])
-    self.message_seeing.set_message('eps_tg','%8.3f' % self.meas_manager.seeing[1])
-    self.message_seeing.set_message('eps_lz','%8.3f' % self.meas_manager.seeing[2])
-    self.message_seeing.set_message('eps_tz','%8.3f' % self.meas_manager.seeing[3])
-    self.message_focus.set_message('width_x','%8.3f' % self.meas_manager.last_focus[0])
-    self.message_focus.set_message('width_y','%8.3f' % self.meas_manager.last_focus[1])
-    self.message_focus.set_message('height','%8.3f' % self.meas_manager.last_focus[2])
+    try:
+      self.proc_flags.set_indicator('Main Thread',self.meas_manager.isAlive())
+      self.proc_flags.set_indicator('results_stat',self.meas_manager.results_stat.isSet())
+      self.proc_mang_mess.message('state','%s' % self.meas_manager.message)
+      self.proc_mang_results.message('state','%r' % self.meas_manager.results)
+      self.message_center.set_message('cur_center','(%7.2f,%7.2f)' % \
+        (self.meas_manager.center[0][0],self.meas_manager.center[0][1]))
+      self.message_center.set_message('delta_vec','(%7.2f,%7.2f,%7.2f)' % \
+        (self.meas_manager.center[1][0],self.meas_manager.center[1][1],self.meas_manager.center[1][2]))
+      self.message_center.set_message('drtheta','(%7.2f,%7.2f)' % \
+        (self.meas_manager.center[2][0],self.meas_manager.center[2][1]))
+      self.message_center.set_message('direct','%s' % self.meas_manager.center[3].capitalize())
+      self.message_midpnt.set_message('midpoint','(%7.2f,%7.2f)' % \
+        (self.meas_manager.midpoint[0][0],self.meas_manager.midpoint[0][1]))
+      self.message_midpnt.set_message('delta_vec','(%7.2f,%7.2f,%7.2f)' % \
+        (self.meas_manager.midpoint[1][0],self.meas_manager.midpoint[1][1],self.meas_manager.midpoint[1][2]))
+      self.message_midpnt.set_message('drtheta','(%7.2f,%7.2f)' % \
+        (self.meas_manager.midpoint[2][0],self.meas_manager.midpoint[2][1]))
+      self.message_midpnt.set_message('direct','%s' % self.meas_manager.midpoint[3].capitalize())
+      self.message_peaks0.set_message('index','%d' % self.meas_manager.peak_0[0])
+      self.message_peaks0.set_message('x_y','(%7.3f,%7.3f)' % \
+        (self.meas_manager.peak_0[1],self.meas_manager.peak_0[3]))
+      self.message_peaks0.set_message('x_y_width','(%7.3f,%7.3f)' % \
+        (self.meas_manager.peak_0[2],self.meas_manager.peak_0[4]))
+      self.message_peaks0.set_message('height','%8.3f' % self.meas_manager.peak_0[5])
+      self.message_peaks1.set_message('index','%d' % self.meas_manager.peak_1[0])
+      self.message_peaks1.set_message('x_y','(%7.3f,%7.3f)' % \
+        (self.meas_manager.peak_1[1],self.meas_manager.peak_1[3]))
+      self.message_peaks1.set_message('x_y_width','(%7.3f,%7.3f)' % \
+        (self.meas_manager.peak_1[2],self.meas_manager.peak_1[4]))
+      self.message_peaks1.set_message('height','%8.3f' % self.meas_manager.peak_1[5])
+      self.message_seeing.set_message('eps_lg','%8.3f' % self.meas_manager.seeing[0])
+      self.message_seeing.set_message('eps_tg','%8.3f' % self.meas_manager.seeing[1])
+      self.message_seeing.set_message('eps_lz','%8.3f' % self.meas_manager.seeing[2])
+      self.message_seeing.set_message('eps_tz','%8.3f' % self.meas_manager.seeing[3])
+      self.message_focus.set_message('width_x','%8.3f' % self.meas_manager.last_focus[0])
+      self.message_focus.set_message('width_y','%8.3f' % self.meas_manager.last_focus[1])
+      self.message_focus.set_message('height','%8.3f' % self.meas_manager.last_focus[2])
+    except Exception as err:  pass
     self.after_id=self.after(10,self.check_update)
     return
 
@@ -227,21 +229,23 @@ class ProcessGui(fg.FrameGUI):
     self.parent.reset_process()
     return
   def check_update(self):
-    self.proc_message.message('state','%s' % self.parent.imageproc.message)
-    self.message_frame1.set_message('num_measures',self.parent.imageproc.num_measures)
-    self.message_frame1.set_message('image_queue_qsize',self.parent.imageproc.image_queue.qsize())
-    self.message_frame1.set_message('image_count',self.parent.imageproc.image_count)
-    self.message_frame1.set_message('reject_count',self.parent.imageproc.reject_count)
-    self.message_frame1.set_message('accept_count',self.parent.imageproc.accept_count)
-    self.message_frame1.set_message('process_type',self.parent.imageproc.process_type)
-    self.message_frame2.set_message('num_objects',self.parent.imageproc.process.num_objects)
-    self.message_frame2.set_message('len_peaks_array',len(self.parent.imageproc.process.peaks))
-    self.proc_flags.set_indicator('Main Thread',self.parent.imageproc.isAlive())
-    self.proc_flags.set_indicator('run_proc_event',self.parent.imageproc.run_proc_event.isSet())
-    self.proc_flags.set_indicator('process_done',self.parent.imageproc.process_done.isSet())
-    self.proc_flags.set_indicator('processed_image_ready',self.parent.imageproc.processed_image_ready.isSet())
-    self.proc_flags.set_indicator('measure_done',self.parent.imageproc.measure_done.isSet())
-    self.check_process()
+    try:
+      self.proc_message.message('state','%s' % self.parent.imageproc.message)
+      self.message_frame1.set_message('num_measures',self.parent.imageproc.num_measures)
+      self.message_frame1.set_message('image_queue_qsize',self.parent.imageproc.image_queue.qsize())
+      self.message_frame1.set_message('image_count',self.parent.imageproc.image_count)
+      self.message_frame1.set_message('reject_count',self.parent.imageproc.reject_count)
+      self.message_frame1.set_message('accept_count',self.parent.imageproc.accept_count)
+      self.message_frame1.set_message('process_type',self.parent.imageproc.process_type)
+      self.message_frame2.set_message('num_objects',self.parent.imageproc.process.num_objects)
+      self.message_frame2.set_message('len_peaks_array',len(self.parent.imageproc.process.peaks))
+      self.proc_flags.set_indicator('Main Thread',self.parent.imageproc.isAlive())
+      self.proc_flags.set_indicator('run_proc_event',self.parent.imageproc.run_proc_event.isSet())
+      self.proc_flags.set_indicator('process_done',self.parent.imageproc.process_done.isSet())
+      self.proc_flags.set_indicator('processed_image_ready',self.parent.imageproc.processed_image_ready.isSet())
+      self.proc_flags.set_indicator('measure_done',self.parent.imageproc.measure_done.isSet())
+      self.check_process()
+    except Exception as err:  pass
     self.after_id=self.after(10,self.check_update)
     return
 #12345######################
@@ -359,37 +363,39 @@ class DeviceGui(fg.FrameGUI):
     self.set_dev_entries()
     return
   def check_update(self):
-    self.device_message.message('state','%s' % self.parent.imageproc.device.message)
-    self.device_parms.set_message('exposure_count',self.parent.imageproc.device.exposure_count)
-    self.device_parms.set_message('data_queue_qsize', self.parent.imageproc.device.data_queue.qsize())
-    self.device_parms.set_message('sequence_count',self.parent.imageproc.device.sequence_count)
-    self.device_exps.set_message('exptime',self.parent.imageproc.device.exptime)
-    self.device_exps.set_message('auto_delay',self.parent.imageproc.device.auto_delay)
-    self.device_exps.set_message('gain',self.parent.imageproc.device.gain)
-    self.device_exps.set_message('seq_exp_list',\
-      str(self.parent.imageproc.device.seq_exp_list).replace(']','').replace('[',''))
-    self.device_info.set_message('region_height','%s' %self.parent.imageproc.device.height)
-    self.device_info.set_message('region_width','%s' %self.parent.imageproc.device.width)
-    self.device_info.set_message('binning_x','%s' %self.parent.imageproc.device.binning_x)
-    self.device_info.set_message('binning_y','%s' %self.parent.imageproc.device.binning_y)
-    self.device_info.set_message('offset_x','%s' %self.parent.imageproc.device.offset_x)
-    self.device_info.set_message('offset_y','%s' %self.parent.imageproc.device.offset_y)
-    self.device_info.set_message('data_mean','%10.5f' % self.parent.imageproc.device.data.mean())
-    self.device_info.set_message('data_std','%10.5f' % self.parent.imageproc.device.data.std())
-    if hasattr(self.parent.imageproc.device,'camera'):
-      self.camera_info.set_message('cam_maxh','%s' %self.parent.imageproc.device.camera.HeightMax)
-      self.camera_info.set_message('cam_maxw','%s' %self.parent.imageproc.device.camera.WidthMax)
-      self.camera_info.set_message('camera_height','%s' %self.parent.imageproc.device.camera.Height)
-      self.camera_info.set_message('camera_width','%s' %self.parent.imageproc.device.camera.Width)
-      self.camera_info.set_message('binning_x','%s' %self.parent.imageproc.device.camera.BinningHorizontal)
-      self.camera_info.set_message('binning_y','%s' %self.parent.imageproc.device.camera.BinningVertical)
-      self.camera_info.set_message('offset_x','%s' %self.parent.imageproc.device.camera.OffsetX)
-      self.camera_info.set_message('offset_y','%s' %self.parent.imageproc.device.camera.OffsetY)
-    self.proc_flags.set_indicator('Main Thread',self.parent.imageproc.device.isAlive())
-    self.proc_flags.set_indicator('take_exposure_stat',self.parent.imageproc.device.take_exposure_stat.isSet())
-    self.proc_flags.set_indicator('read_out_stat',self.parent.imageproc.device.read_out_stat.isSet())
-    self.proc_flags.set_indicator('new_data_ready_stat',self.parent.imageproc.device.new_data_ready_stat.isSet())
-    self.proc_flags.set_indicator('auto_sequence_stat',self.parent.imageproc.device.auto_sequence_stat.isSet())
+    try:
+      self.device_message.message('state','%s' % self.parent.imageproc.device.message)
+      self.device_parms.set_message('exposure_count',self.parent.imageproc.device.exposure_count)
+      self.device_parms.set_message('data_queue_qsize', self.parent.imageproc.device.data_queue.qsize())
+      self.device_parms.set_message('sequence_count',self.parent.imageproc.device.sequence_count)
+      self.device_exps.set_message('exptime',self.parent.imageproc.device.exptime)
+      self.device_exps.set_message('auto_delay',self.parent.imageproc.device.auto_delay)
+      self.device_exps.set_message('gain',self.parent.imageproc.device.gain)
+      self.device_exps.set_message('seq_exp_list',\
+        str(self.parent.imageproc.device.seq_exp_list).replace(']','').replace('[',''))
+      self.device_info.set_message('region_height','%s' %self.parent.imageproc.device.height)
+      self.device_info.set_message('region_width','%s' %self.parent.imageproc.device.width)
+      self.device_info.set_message('binning_x','%s' %self.parent.imageproc.device.binning_x)
+      self.device_info.set_message('binning_y','%s' %self.parent.imageproc.device.binning_y)
+      self.device_info.set_message('offset_x','%s' %self.parent.imageproc.device.offset_x)
+      self.device_info.set_message('offset_y','%s' %self.parent.imageproc.device.offset_y)
+      self.device_info.set_message('data_mean','%10.5f' % self.parent.imageproc.device.data.mean())
+      self.device_info.set_message('data_std','%10.5f' % self.parent.imageproc.device.data.std())
+      if hasattr(self.parent.imageproc.device,'camera'):
+        self.camera_info.set_message('cam_maxh','%s' %self.parent.imageproc.device.camera.HeightMax)
+        self.camera_info.set_message('cam_maxw','%s' %self.parent.imageproc.device.camera.WidthMax)
+        self.camera_info.set_message('camera_height','%s' %self.parent.imageproc.device.camera.Height)
+        self.camera_info.set_message('camera_width','%s' %self.parent.imageproc.device.camera.Width)
+        self.camera_info.set_message('binning_x','%s' %self.parent.imageproc.device.camera.BinningHorizontal)
+        self.camera_info.set_message('binning_y','%s' %self.parent.imageproc.device.camera.BinningVertical)
+        self.camera_info.set_message('offset_x','%s' %self.parent.imageproc.device.camera.OffsetX)
+        self.camera_info.set_message('offset_y','%s' %self.parent.imageproc.device.camera.OffsetY)
+      self.proc_flags.set_indicator('Main Thread',self.parent.imageproc.device.isAlive())
+      self.proc_flags.set_indicator('take_exposure_stat',self.parent.imageproc.device.take_exposure_stat.isSet())
+      self.proc_flags.set_indicator('read_out_stat',self.parent.imageproc.device.read_out_stat.isSet())
+      self.proc_flags.set_indicator('new_data_ready_stat',self.parent.imageproc.device.new_data_ready_stat.isSet())
+      self.proc_flags.set_indicator('auto_sequence_stat',self.parent.imageproc.device.auto_sequence_stat.isSet())
+    except Exception as err:  pass
     self.after_id=self.after(10,self.check_update)
     return
 
