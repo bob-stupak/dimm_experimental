@@ -72,11 +72,13 @@ class generic_thread(threading.Thread):
     if self.logging_flag:
       if not os.path.exists(fullpath): os.makedirs(fullpath)
     if logname:
+      self.logbasename=logname
       self.logfile_name=os.path.join(fullpath,logname+'.'+time.strftime('%m.%d.%Y'))
       ''' @ivar: The logfile name given in the common_parms.py file in the home directory.
       '''
     else:
       self.logfile_name=os.path.join(fullpath,THREAD_LOGBASENAME+'.'+time.strftime('%m.%d.%Y'))
+      self.logbasename=None
       ''' @ivar: The logfile name given in the common_parms.py file in the home directory.
       '''
     # The following are a set of events to be flagged for processing images
@@ -195,6 +197,7 @@ class generic_thread(threading.Thread):
     fullpath=ospjoin(subdir2,test_subdir)
     if not ospexists(fullpath): makedirs(fullpath)
     if f_basename: fname='%s.%s.log' % (f_basename,fname_date)
+    elif self.logbasename: fname='%s.%s' % (self.logbasename,fname_date)
     else: fname='%s.%s.log' % (THREAD_LOGBASENAME,fname_date)
     self.logfile_name=ospjoin(fullpath,fname)
     if ospexists(self.logfile_name): appendfile='a'

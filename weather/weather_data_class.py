@@ -274,8 +274,8 @@ class weather_thread(gth.generic_thread):
     subdir1=os.path.join(LOG_DIR,time.strftime('%b%Y'))
     fullpath=os.path.join(subdir1,time.strftime('%B%d'))
     if not os.path.exists(fullpath): os.makedirs(fullpath)
-    self.logbasename=WEA_LOGBASENAME
-    self.logfile_name=os.path.join(fullpath,WEA_LOGBASENAME+'.'+time.strftime('%m.%d.%Y'))
+    #self.logbasename=WEA_LOGBASENAME
+    #self.logfile_name=os.path.join(fullpath,WEA_LOGBASENAME+'.'+time.strftime('%m.%d.%Y'))
     #self.logfile_name=LOG_DIR+WEA_LOGBASENAME+'.'+self.local_date.replace('/','.')
     if not loc_tion:
       self.location=sct.LocationThread()
