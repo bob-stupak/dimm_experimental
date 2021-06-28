@@ -46,12 +46,13 @@ BASIC_QUERY='select dew_point_time,air_temperature,dew_point,humidity,split from
             'order by id desc limit 10'
 
 class Sql_connection(object):
-  def __init__(self,host=MYSQL_CONN['host'],user=MYSQL_CONN['user'],passwd=MYSQL_CONN['passwd'],db=MYSQL_CONN['db']):
+  def __init__(self,host=MYSQL_CONN['host'],user=MYSQL_CONN['user'],passwd=MYSQL_CONN['passwd'],db=MYSQL_CONN['db'],
+    connect_timeout=10):
     self.host=host
     self.user=user
     self.passwd=passwd
     self.db=db
-    self.connection=mysql.connect(host=host,user=user,passwd=passwd,db=db)
+    self.connection=mysql.connect(host=host,user=user,passwd=passwd,db=db,connect_timeout=connect_timeout)
     self.cursor=self.connection.cursor(mysql.cursors.DictCursor)
     self.connection_status=False
     self.connection_busy=Lock()
