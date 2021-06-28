@@ -141,7 +141,10 @@ def open_seeing_log(fname='',mon=4,day=18,year=2018):
     seeinglog='seeing.dat.%s.%s.%d' % (str(mon).zfill(2),str(day).zfill(2),year)
   seeing=loadtxt(seeinglog,delimiter=',',dtype='S',comments='#').transpose()
   dtime_string=[seeing[1,i]+' '+seeing[0,i] for i in range(len(seeing[0]))]
-  dt_time=array([datetime.datetime.strptime(each,'%m/%d/%Y %H:%M:%S') for each in dtime_string])
+  try:
+    dt_time=array([datetime.datetime.strptime(each,'%m/%d/%Y %H:%M:%S') for each in dtime_string])
+  except Exception as err: 
+    dt_time=array([datetime.datetime.strptime(each,'%m/%d/%Y %H:%M:%S.%f') for each in dtime_string])
   airmass=seeing[10].astype('f')
   etz=seeing[-3].astype('f')
   elz=seeing[-5].astype('f')
