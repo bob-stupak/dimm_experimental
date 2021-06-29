@@ -12,6 +12,7 @@ import os
 
 from Tkinter import *
 import Pmw as pmw
+import guis.notebook as ntbk
 import guis.frame_gui as fg
 import guis.imagecanvasgui as icanv
 
@@ -29,9 +30,12 @@ def mem():
 
 #12345######################
 class MeasureGui(fg.FrameGUI):
-  def __init__(self,parent=None,col=0,row=0,colspan=1,rowspan=1):
+  def __init__(self,root=None,parent=None,col=0,row=0,colspan=1,rowspan=1):
     self.parent=parent
-    self.root=self.parent.interior()
+    if root:
+      self.root=root
+    else:
+      self.root=self.parent.interior()
     self.meas_manager=self.parent.process_manager
     self._mesBarList=[\
                       ['proc_mang_results','Process Manager Results',50,(0,20,15,1,'nsew')],\
@@ -169,9 +173,12 @@ class MeasureGui(fg.FrameGUI):
 
 #12345######################
 class ProcessGui(fg.FrameGUI):
-  def __init__(self,parent=None,col=0,row=0,colspan=1,rowspan=1):
+  def __init__(self,root=None,parent=None,col=0,row=0,colspan=1,rowspan=1):
     self.parent=parent
-    self.root=self.parent.interior()
+    if root:
+      self.root=root
+    else:
+      self.root=self.parent.interior()
     self._mesBarList=[['proc_message','Process Message',50,(0,7,22,1,'nsew')]]
     self._mesFrameList=[['message_frame1','Process Messages',['num_measures','image_queue_qsize','image_count',\
                          'reject_count','accept_count','process_type'],(4,0,3,5,'nsew')],\
@@ -250,9 +257,12 @@ class ProcessGui(fg.FrameGUI):
     return
 #12345######################
 class DeviceGui(fg.FrameGUI):
-  def __init__(self,parent=None,num=1,col=0,row=0,colspan=1,rowspan=1):
+  def __init__(self,root=None,parent=None,num=1,col=0,row=0,colspan=1,rowspan=1):
     self.parent=parent
-    self.root=self.parent.interior()
+    if root:
+      self.root=root
+    else:
+      self.root=self.parent.interior()
     self._optionList=[['device_select','Device',self.parent.device_name,CAMERA_LIST,\
                       self.parent.set_device,(4,0,3,1,'nsew')]]
     self._indicatorList=[['proc_flags','Process Flags',['Main Thread','take_exposure_stat','read_out_stat',\
@@ -399,9 +409,8 @@ class DeviceGui(fg.FrameGUI):
     self.after_id=self.after(10,self.check_update)
     return
 
-#12345######################
 class ImageProcGUI(fg.FrameGUI):
-  def __init__(self,root=None,parent=None,col=0,row=0,colspan=1,rowspan=1,proc_thread=None,device_name='file'):
+  def __init__(self,root=None,parent=None,col=0,row=1,colspan=1,rowspan=1,proc_thread=None,device_name='file'):
     self.parent=parent
     self.device_name=device_name
     self.fileformat='fits'
@@ -413,12 +422,16 @@ class ImageProcGUI(fg.FrameGUI):
       ['test_sequence','Test Sequence','(lambda s=self: s.testsequence())',(4,20,1,1,'nsew')],\
       ['clr_plt_queue','Clear Plot Queue','(lambda s=self: s.clear_plot_queue())',(3,20,1,1,'nsew')]]
     self._indicatorList=[['proc_flags','Plotting Flags',['plotq_empty','plot_ready'],(0,20,2,7,'nsew')]]
+#   self._indicatorList=[['proc_flags','Plotting Flags',['plotq_empty','plot_ready'],(0,0,8,1,'nw')]]
     #self._entryList=[[]]
     #self._optionList=[[]]
     #self._checkList=[[]]
     #self._listboxList=[[]]
     fg.FrameGUI.__init__(self,root=root,name='Image Processing Items',col=col,row=row,\
       colspan=colspan,rowspan=rowspan)
+    self.notebook=ntbk.AppNoteBook(self.interior())
+    self.notebook.grid(row=2,column=0,columnspan=8,rowspan=3,sticky='nsew')
+    self.notebook.component('hull').configure(width=1100,height=600)
     if self.parent==None:
       self._figure=icanv.ImageCanvas(root=root,col=col+colspan+1,row=row+rowspan-1)
       self.process_manager=imthread.Measurement_thread(device_name=device_name)
@@ -426,10 +439,9 @@ class ImageProcGUI(fg.FrameGUI):
       self._figure=self.parent._figure
       self.process_manager=proc_thread #self.parent.thread_manager.__dict__[proc_thread]
     self.imageproc=self.process_manager.process_thread
-#   self.image_file_gui=pgf.ImageFrame(root=self,row=1,col=0,colspan=6,rowspan=1)
-    self.measure_gui=MeasureGui(parent=self,col=0,row=2,colspan=6,rowspan=1)
-    self.process_gui=ProcessGui(parent=self,col=0,row=5,colspan=6,rowspan=1)
-    self.device_gui=DeviceGui(parent=self,col=0,row=10,colspan=6,rowspan=1)
+    self.measure_gui=MeasureGui(root=self.notebook.page1,parent=self,col=0,row=2,colspan=6,rowspan=1)
+    self.process_gui=ProcessGui(root=self.notebook.page2,parent=self,col=0,row=5,colspan=6,rowspan=1)
+    self.device_gui=DeviceGui(root=self.notebook.page3,parent=self,col=0,row=10,colspan=6,rowspan=1)
     self.imgcount=0
     self.camcount=0
     self.check_update()
@@ -524,7 +536,7 @@ if __name__=='__main__':
   xx=Button(root,text='Exit',font=fg.TEXT_FONT,command=stopProgs,\
     width=6,padx=0,pady=0)
   xx.grid(column=0,row=0,sticky='nw')
-  fgui=fg.FrameGUI(root=root,name='Testing',col=0,row=1,colspan=4)
+  fgui=fg.FrameGUI(root=root,name='Testing',col=0,row=1,colspan=4,rowspan=2)
   ggui=ImageProcGUI(root=fgui.interior(),device_name=cname)
   root.mainloop()
 
