@@ -430,8 +430,8 @@ class ImageProcGUI(fg.FrameGUI):
     fg.FrameGUI.__init__(self,root=root,name='Image Processing Items',col=col,row=row,\
       colspan=colspan,rowspan=rowspan)
     self.notebook=ntbk.AppNoteBook(self.interior())
-    self.notebook.grid(row=2,column=0,columnspan=8,rowspan=3,sticky='nsew')
-    self.notebook.component('hull').configure(width=1100,height=600)
+    self.notebook.grid(row=3,column=0,columnspan=8,rowspan=1,sticky='nsew')
+#   self.notebook.component('hull').configure(width=1100,height=600)
     if self.parent==None:
       self._figure=icanv.ImageCanvas(root=root,col=col+colspan+1,row=row+rowspan-1)
       self.process_manager=imthread.Measurement_thread(device_name=device_name)
@@ -480,13 +480,9 @@ class ImageProcGUI(fg.FrameGUI):
     self.plot_ready_flag=True
     return
   def stopAll(self):
-    self._figure.destroy()
-    self.process_gui.stop_update()
-    self.measure_gui.stop_update()
-#   self.device_gui.stop_update()
-    self.stop_update()
+    try:  self.stop_update()
+    except Exception as err:  pass
     self.process_manager.stop()
-    #self.imageproc.stop()
     try:
       self.device.close()
     except Exception: pass
@@ -509,14 +505,25 @@ class ImageProcGUI(fg.FrameGUI):
     self.proc_flags.set_indicator('plot_ready',self._figure.plot_ready_flag)
     self.after_id=self.after(5,self.check_update)
     return
+  def stop_update(self):
+    if not self.parent:
+      self._figure.destroy()
+    self.process_gui.stop_update()
+    self.measure_gui.stop_update()
+    self.device_gui.stop_update()
+    self.notebook.destroy()
+    self.after_cancel(self.after_id)
+    return
 
 def stopProgs():
   global root,progStat,ggui
-  ggui.stopAll()
+  try:  ggui.stopAll()
+  except Exception as err:  pass
 # progStat=False
   imthread.progStat=False
   print 'Killing root GUI'
-  root.destroy()
+  try:  root.destroy()
+  except Exception as err:  pass
   print 'Sucessfully exited'
   sys.exit()
   return

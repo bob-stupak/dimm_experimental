@@ -583,7 +583,7 @@ class ManagerGUI(fg.FrameGUI):
     twind=Toplevel()
     twind.title('Camera Eng GUI')
     #tlevel=CameraGUI(root=twind,parent=self,col=0,row=1,colspan=4,device=self.thread_manager.camera)
-    tlevel=ImageProcGUI(root=twind,parent=self,col=0,row=1,colspan=4,\
+    tlevel=ImageProcGUI(root=twind,parent=self,col=0,row=2,colspan=4,\
       proc_thread=self.thread_manager.image,\
       device_name=self.thread_manager.image.process_thread.device_name)
     xButton=Button(twind,text='Exit',font=fg.TEXT_FONT,command=twind.destroy,width=6,padx=0,pady=0)
@@ -593,7 +593,7 @@ class ManagerGUI(fg.FrameGUI):
     twind=Toplevel()
     twind.title('Finder Eng GUI')
 #   tlevel=CameraGUI(root=twind,parent=self,col=0,row=1,colspan=4,device=self.thread_manager.finder)
-    tlevel=ImageProcGUI(root=twind,parent=self,col=0,row=1,colspan=4,\
+    tlevel=ImageProcGUI(root=twind,parent=self,col=0,row=2,colspan=4,\
       proc_thread=self.thread_manager.finderimage,\
       device_name=self.thread_manager.finderimage.process_thread.device_name)
     tlevel.component('tag').configure(bg='RoyalBlue')
@@ -632,7 +632,8 @@ def stopProgs():
   print 'Stopping All Manager Processes'
   mgui.stopAll()
   print 'DIMM Manager Sucessfully exited'
-  root.destroy()
+  try:  root.destroy()
+  except Exception as err:  pass
   sys.exit()
   return
 

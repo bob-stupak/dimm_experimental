@@ -155,6 +155,11 @@ def open_seeing_log(fname='',mon=4,day=18,year=2018):
   eps_zcorr=epsilon*cos(zdist)**0.6
   return dt_time,airmass,zdist,epsilon,eps_zcorr,seeing
 
+#d_type=dtype([('time',object),('date',object),('lst',object),('object',object),('ra',object),('dec',object),('az',object),('elv',object),('zd',float64),('zdd','S'),('airmass',float64),('pxdist',float64),('elg',float64),('elz',float64),('etg',float64),('etz',float64),('numa',int32),('numr',int32)])
+#seeing=loadtxt(mmss,delimiter=',',dtype=d_type,comments='#').transpose()
+#[datetime.datetime.strptime('%s %s' % (x,y),'%m/%d/%Y %H:%M:%S.%f') for x,y in zip(seeing['date'],seeing['time'])]
+
+
 def open_weather_log(fname='',subdir='./',mon=4,day=18,year=2018,station='1'):
   if fname!='':
     weatherlog=os.path.join(LOG_DIR,subdir,fname)
@@ -284,16 +289,17 @@ def all_hist_cdf_plot(maxlim=3.0,scale='lin'):
   cdf_axs.grid(True)
   cdf_axs.set_xlabel('Corrected Seeing (\")',size=20)
   cdf_axs.set_ylabel('Number',size=20)
-  textx=[2.0/3.0*maxlim]*5  # Linear text x-position
-  texty=c.max()/array([1.520,1.725,2.0,2.3,2.9])  # Linear text y-position
+  textx=[2.0/3.0*maxlim]*6  # Linear text x-position
+  texty=c.max()/array([1.520,1.725,2.0,2.3,2.9,4.3])  # Linear text y-position
   if scale=='ylog' or scale=='log':
     hist_axs.set_yscale('log')
     cdf_axs.set_yscale('log')
-    texty=c.max()/array([log10(1.520)*10.0,log10(1.725)*15.0,log10(2.0)*25.0,log10(2.30)*35.0,log10(2.90)*50.0])
+    texty=c.max()/array([log10(1.520)*10.0,log10(1.725)*15.0,log10(2.0)*25.0,log10(2.30)*35.0,log10(2.90)*50.0,
+      log10(4.3)*50.0])
     if scale=='log':
       xmax=hist_axs.get_xlim()[1]
-      if maxlim>=10.0: textx=[xmax/5.0]*5
-      else: textx=[0.025]*5
+      if maxlim>=10.0: textx=[xmax/5.0]*6
+      else: textx=[0.025]*6
       cdf_axs.set_xscale('log')
       hist_axs.set_xscale('log')
   mstr='$N_{Tot}=%d$' % (int(len(mymm[1])))
@@ -302,11 +308,21 @@ def all_hist_cdf_plot(maxlim=3.0,scale='lin'):
   hist_axs.text(textx[1],texty[1],mstr,size=20)
   mstr='$\Sigma N/N_{Tot}=%6.3f$' % (c.sum()/len(mymm[1]))
   hist_axs.text(textx[2],texty[2],mstr,size=20)
-  mstr='$\mu\pm\sigma=$%5.4f$\pm$%5.4f' % (mymm[1][where(mymm[1]<maxlim)].mean(),\
+  mstr='$\\bar{x}\pm s=$%5.4f$\pm$%5.4f' % (mymm[1][where(mymm[1]<maxlim)].mean(),\
     mymm[1][where(mymm[1]<maxlim)].std())
   hist_axs.text(textx[3],texty[3],mstr,size=20)
   mstr='$\\tilde{x}=$%5.4f' % (median(mymm[1][where(mymm[1]<maxlim)]))
   hist_axs.text(textx[4],texty[4],mstr,size=20)
+  idx=where(c==c.max())[0][0]
+  mde=0.5*(b[idx]+b[idx+1])
+  mstr='$M_o=$%5.4f' % (mde)
+  hist_axs.text(textx[5],texty[5],mstr,size=20)
+  hist_axs.axvline(mymm[1][where(mymm[1]<maxlim)].mean(),color='MediumVioletRed')
+  hist_axs.axvline(median(mymm[1][where(mymm[1]<maxlim)]),color='MediumVioletRed')
+  hist_axs.axvline(mde,color='MediumVioletRed')
+  cdf_axs.axvline(mymm[1][where(mymm[1]<maxlim)].mean(),color='MediumVioletRed')
+  cdf_axs.axvline(median(mymm[1][where(mymm[1]<maxlim)]),color='MediumVioletRed')
+  cdf_axs.axvline(mde,color='MediumVioletRed')
   return
 
 # Some fun and interesting seeing data analyisis:

@@ -12,7 +12,7 @@ class AppNoteBook(pmw.NoteBook):
     else: self.master=Tk()
     self._pageList=['Measurements','Process','Device']
     self._number=1
-    pmw.NoteBook.__init__(self,self.master,hull_width=400,hull_height=450)
+    pmw.NoteBook.__init__(self,self.master,hull_width=1300,hull_height=600)
     self.configNoteBook()
     return
   def configNoteBook(self):
