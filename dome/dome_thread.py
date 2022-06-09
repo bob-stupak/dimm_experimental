@@ -43,7 +43,7 @@ class DomeThread(gth.generic_thread):
        <returnSerial>.
     '''
     gth.generic_thread.__init__(self,name=name,log=False,sleeptime=DOME_THREADTIME,prnt=prnt)
-    self.time_to_check=30  # The number of cycles to check the status
+    self.time_to_check=20  # The number of cycles to check the status
     self.time_check_cnt=0  # The count of cycles
     self.dome_closed_stat=threading.Event()  #Event to indicate the dome is closed
     '''@ivar: Status of the Dome, can be used to indicate the dome status to other threads '''
@@ -100,11 +100,11 @@ class DomeThread(gth.generic_thread):
        Starts the dome thread in the background, will continually monitor the dome
     '''
     self.thread_stat.set()                  # Set "thread_stat"
-    self.send_command('status')
+#   self.send_command('status')
     while self.prog_stat:
       time.sleep(self.sleeptime)       # Sleep for the refresh time
       if self.thread_stat.isSet():
-        #self.get_time()
+        self.get_time()
         #print self.local_time,self.msg,self.north_mve_status,self.open_close_cntr_str,
           #'North leaf current status:   %s' % (self.north_cur_status.zfill(2))
         #print '>>>>',self.msg,self.south_mve_status,self.open_close_cntr_str,
@@ -112,11 +112,11 @@ class DomeThread(gth.generic_thread):
         #self.set_message('%s %s %s %s %s %s %s %s %s' % (self.msg,self.cmd_to_open_stat.isSet(),
         #  self.cmd_to_close_stat.isSet(),self.open_close_cntr_str,self.dome_moving_stat.isSet(),
         #  self.north_mve_status,self.north_cur_status.zfill(2),self.south_mve_status,self.south_cur_status.zfill(2)))
-        if self.time_to_check>=self.time_check_cnt:
-          self.read_port()
-          self.time_check_cnt=0
-        else:
-          self.time_check_cnt+=1
+#       if self.time_to_check>=self.time_check_cnt:
+        self.read_port()
+#         self.time_check_cnt=0
+#       else:
+#         self.time_check_cnt+=1
         if len(self.msg_list)>50:
           self.msg_list=[self.msg]
         if not self.dome_moving_stat.isSet():
@@ -137,11 +137,11 @@ class DomeThread(gth.generic_thread):
     '''read_port
        Reads the port
     '''
-    self.lock.acquire()
+#   self.lock.acquire()
     messg='%s' % self.port.read_all()  # Read the serial port message
     self.translate_message(messg)
-    if self.lock.locked():
-      self.lock.release()
+#   if self.lock.locked():
+#     self.lock.release()
     return
   def send_command(self,cmd='status'):
     '''send_command
@@ -245,7 +245,7 @@ class DomeThread(gth.generic_thread):
     except Exception as err: pass
     self.set_message('#Stopping Thread!!!!')
     self.thread_stat.clear()
-    self.port.close()
+    self.port.closedown()
     self.prog_stat=False
     return
   def change_port(self,port='-'):

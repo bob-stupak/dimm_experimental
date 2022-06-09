@@ -32,29 +32,68 @@ on Linux have to use from command line or put inside the file /etc/modules
 class DomeSockPort(socket.socket):
   '''<DomeSockPort> is a client socket set up for the telescope communications
   '''
-  def __init__(self,host=DOME_SOCK_HOST,port=DOME_SOCK_PORT,timeout=5.0):
+  def __init__(self,host=DOME_SOCK_HOST,port=DOME_SOCK_PORT,timeout=0.2):
     self.ihost,self.iport=host,port
     socket.socket.__init__(self,socket.AF_INET,socket.SOCK_STREAM)
-    try:
-      rmxa.reset_moxa(host=self.ihost)
-      self.connect((self.ihost,self.iport))
-      self.settimeout(timeout)
-    except Exception:
-      print 'CONNECTION could NOT be established!!!'
+    self.is_connected=False
+    self.sock_message=''
+    self.sock_err=''
+#   try:
+#     rmxa.reset_moxa(host=self.ihost)
+#     self.connect((self.ihost,self.iport))
+#     self.settimeout(timeout)
+#   except Exception:
+#     print 'CONNECTION could NOT be established!!!'
+    self.connect_to_server()
     return
   def read_all(self):
+    for i in range(100):
+      try:
+        ret=self.recv(1024)
+      except Exception as err:
+        ret=''
+      if ret!='':  ret_old=ret
+      else:  break
     try:
-      ret=self.recv(1024)
+      ret=ret_old.split('\r\n')[-2].zfill(2)
     except Exception as err:
       ret=''
     return ret
   def write(self,cmd,size=1):
-    self.send(cmd)
-    ret='o'
-    return ret
+#   self.send(cmd)
+    try:  self.send(cmd)
+    except Exception as err:
+      self.is_connected=False
+      if err.errno==9:
+        self.sock_message=err
+        self.connect_to_server()
+      else:  self.sock_message=err
+    except AttributeError as err:
+      self.sock_message=err
+    return
+#   ret='o'
+#   return ret
+  def connect_to_server(self):
+    try:  self.close()
+    except Exception as err: pass
+    socket.socket.__init__(self,socket.AF_INET,socket.SOCK_STREAM)
+    try:
+      self.connect((self.ihost,self.iport))
+      self.settimeout(0.1)
+      self.is_connected=True
+      #self.setblocking(0)
+      #self.stdout_flag=True
+    except Exception as err:
+      self.sock_message=err
+      if err.errno!=106:  self.is_connected=False
+    return
   def closedown(self):
-    self.shutdown(socket.SHUT_RDWR)
-    self.close()
+#   self.shutdown(socket.SHUT_RDWR)
+#   self.close()
+    try:  self.shutdown(socket.SHUT_RDWR)
+    except Exception as err:  self.set_message(err)
+    try:  self.close()
+    except Exception as err:  self.set_message(err)
     return
 class DomeSerialPort(serial.Serial):
   '''<TeleSerialPort> is a serial port set up for the telescope communications
