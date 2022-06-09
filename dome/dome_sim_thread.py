@@ -240,10 +240,10 @@ class DomeTestPort(threading.Thread):
     if self.south_closed_sw==True:  ret_str2[2]='1'
     if self.south_opened_sw==True:  ret_str2[1]='1'
     ret_str1=['0b','0','0','0','0']
-    if self.north_opening_stat==True:  ret_str1[4]='1'
-    if self.north_closing_stat==True:  ret_str1[3]='1'
-    if self.south_opening_stat==True:  ret_str1[2]='1'
-    if self.south_closing_stat==True:  ret_str1[1]='1'
+    if self.north_opening_stat==True:  ret_str1[3]='1'
+    if self.north_closing_stat==True:  ret_str1[4]='1'
+    if self.south_opening_stat==True:  ret_str1[1]='1'
+    if self.south_closing_stat==True:  ret_str1[2]='1'
     return hex(int(''.join(ret_str1),2)),hex(int(''.join(ret_str2),2)) #Need to return something for status check
   def readport(self):
     msg=self.status()
